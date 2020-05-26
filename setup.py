@@ -4,7 +4,7 @@ packages = find_namespace_packages('.', include=['dripline.extensions.*'])
 print('packages are: {}'.format(packages))
 
 setup(
-    name="jitter_plugin",
+    name="dripline-orpheus",
     version='v1.0.0',
     packages=packages,
 )
