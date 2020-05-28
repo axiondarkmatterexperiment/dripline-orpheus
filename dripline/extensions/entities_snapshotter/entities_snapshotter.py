@@ -9,6 +9,7 @@ class EntitiesSnapshotter(Entity):
     '''
     An entity that tells a list of entities to log themselves.
     '''
+    # TODO define get, set behavior
 
     def __init__(self, list_of_entities = [], auth_file = None , **kwargs):
         '''
