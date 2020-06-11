@@ -11,7 +11,7 @@ class EntitiesSnapshotter(Entity):
     '''
     # TODO define get, set behavior
 
-    def __init__(self, list_of_entities = [], auth_file = None , **kwargs):
+    def __init__(self, list_of_entities = [], auths_file = None , **kwargs):
         '''
         Args:
             list_of_entities (number): List of entities that you want to command to log themselves.
@@ -21,10 +21,10 @@ class EntitiesSnapshotter(Entity):
 
         Entity.__init__(self, **kwargs)
         self._list_of_entities = list_of_entities
-        self._auth_file = auth_file
+        self._auths_file = auths_file
 
     def log_entities(self):
-        cmd_interface = Interface(dripline_config={'auth-file': self._auth_file})
+        cmd_interface = Interface(dripline_config={'auth-file': self._auths_file})
         for entity in self._list_of_entities:
             logger.info(entity)
             cmd_interface.cmd(entity, "scheduled_log")
