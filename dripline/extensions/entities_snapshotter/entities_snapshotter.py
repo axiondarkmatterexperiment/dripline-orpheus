@@ -1,5 +1,5 @@
 from dripline.core import Entity, Interface, ThrowReply, get_return_codes_dict
-from dripline.implementations import KeyValueStore
+from dripline.implementations import KeyValueStore, SimpleSCPIEntity
 import logging
 logger = logging.getLogger(__name__)
 
