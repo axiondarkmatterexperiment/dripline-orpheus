@@ -1,4 +1,5 @@
-from dripline.core import Entity, Interface
+from dripline.core import Entity, Interface, ThrowReply, get_return_codes_dict
+from dripline.implementations import KeyValueStore, SimpleSCPIEntity
 import logging
 logger = logging.getLogger(__name__)
 
@@ -30,4 +31,24 @@ class EntitiesSnapshotter(Entity):
             cmd_interface.cmd(entity, "scheduled_log")
             logger.info('done with cmd')
 
+__all__.append("LimitedKeyValues")
+class LimitedKeyValues(KeyValueStore):
+    '''
+    An entity that only accepts a limited range of values
+    '''
+    def __init__(self, allowed_values= [], **kwargs):
+        '''
+        Args:
+            allowed_values: a list of values that the entity can accept
+        '''
 
+        KeyValueStore.__init__(self, **kwargs)
+        if not allowed_values:
+            raise ThrowReply('service_error_invalid_value', "Need to specify list of values to accept")
+        self._allowed_values = allowed_values
+
+    def on_set(self, value):
+        print(self._allowed_values)
+        if not value in self._allowed_values:
+            raise ThrowReply('service_error_invalid_value', "Set value is not allowed")
+        return super().on_set(value)
