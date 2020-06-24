@@ -2,6 +2,7 @@ from dripline.core import Entity, Interface, ThrowReply, get_return_codes_dict
 from dripline.implementations import KeyValueStore, SimpleSCPIEntity
 import logging
 logger = logging.getLogger(__name__)
+import time
 
 __all__ = []
 
@@ -12,7 +13,7 @@ class EntitiesSnapshotter(Entity):
     '''
     # TODO define get, set behavior
 
-    def __init__(self, list_of_entities = [], auths_file = None , **kwargs):
+    def __init__(self, list_of_entities = [], auths_file = None , sleep_between_logs = 0, **kwargs):
         '''
         Args:
             list_of_entities (number): List of entities that you want to command to log themselves.
@@ -23,12 +24,15 @@ class EntitiesSnapshotter(Entity):
         Entity.__init__(self, **kwargs)
         self._list_of_entities = list_of_entities
         self._auths_file = auths_file
+        self._sleep_between_logs = sleep_between_logs
 
     def log_entities(self):
         cmd_interface = Interface(dripline_config={'auth-file': self._auths_file})
         for entity in self._list_of_entities:
             logger.info(entity)
             cmd_interface.cmd(entity, "scheduled_log")
+            logger.info('Sleeping for {} seconds between entity logs'.format(self._sleep_between_logs))
+            time.sleep(self._sleep_between_logs)
             logger.info('done with cmd')
 
 __all__.append("LimitedKeyValues")
