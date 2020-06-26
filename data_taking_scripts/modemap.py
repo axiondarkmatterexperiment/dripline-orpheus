@@ -8,7 +8,7 @@ n_sec_wait_for_motor = 3
 
 #move curved mirror to 0 position.
 print('Restarting motor position')
-the_interface.set('curved_mirror_set_position', 0)
+the_interface.set('curved_mirror_move_to_position', 0)
 print('Going to wait {} seconds while motor moves'.format(n_sec_wait_for_motor))
 time.sleep(n_sec_wait_for_motor)
 
