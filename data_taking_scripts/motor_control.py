@@ -6,7 +6,7 @@ auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
 #time to wait for motor to move
-n_sec_wait_for_motor = 3
+n_sec_wait_for_motor = 5
 
 #move curved mirror to 0 position.
 print('Restarting motor position')
@@ -67,7 +67,7 @@ the_interface.set('na_measurement_status', 'start_measurement')
 for entity in log_entities:
     print("logging "+ entity)
     the_interface.cmd(entity, "scheduled_log")
-    time.sleep(0.5)
+    time.sleep(n_sec_wait_for_motor)
 
 #moving curved mirror
 distance = 1 # user input + or -
@@ -96,7 +96,7 @@ time.sleep(n_sec_wait_for_motor)
 
 print('Setting na_measurement_status to stop_measurement')
 the_interface.set('na_measurement_status', 'stop_measurement')
-
+time.sleep(n_sec_wait_for_motor)
 # taking another measurement
 print('Setting na_measurement_status to start_measurement')
 the_interface.set('na_measurement_status', 'start_measurement')
@@ -104,7 +104,7 @@ print('Logging list of endpoints')
 for entity in log_entities:
     print("logging "+ entity)
     the_interface.cmd(entity, "scheduled_log")
-    time.sleep(0.5)
+    time.sleep(n_sec_wait_for_motor)
 
 print('Setting na_measurement_status to stop_measurement')
 the_interface.set('na_measurement_status', 'stop_measurement')
