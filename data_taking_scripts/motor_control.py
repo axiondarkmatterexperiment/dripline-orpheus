@@ -82,17 +82,17 @@ diff = initial_plate_separation + distance
 move_bottom_plate = diff - new_plate_separation #distance to move bottom dielectric plate
 
 #adjusting bottom dielectric plate
-print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
-the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
-print('moved bottom plate')#remove later
-time.sleep(n_sec_wait_for_motor)
+#print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
+#the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
+#print('moved bottom plate')#remove later
+#time.sleep(n_sec_wait_for_motor)
 
 #adjusting top dielectric plate
-#move_top_plate = new_plate_separation - initial_plate_separation
-#print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
-#the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
-#print('moved top plate')#remove later
-#time.sleep(n_sec_wait_for_motor)
+move_top_plate = new_plate_separation - initial_plate_separation
+print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
+the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
+print('moved top plate')#remove later
+time.sleep(n_sec_wait_for_motor)
 
 print('Setting na_measurement_status to stop_measurement')
 the_interface.set('na_measurement_status', 'stop_measurement')
