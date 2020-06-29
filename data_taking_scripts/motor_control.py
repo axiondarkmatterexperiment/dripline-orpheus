@@ -46,7 +46,10 @@ def curved_mirror_distance_to_steps(distance):
     num_pitch_lengths = distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return steps
-
+log_entities = ['na_start_freq' , 'na_stop_freq' , 'na_power' ,'na_averages','na_average_enable',
+                'na_s11_iq_data','na_s21_iq_data','curved_mirror_steps','curved_mirror_motor_get_electronic_gearing',
+                'bottom_dielectric_plate_steps','bottom_dielectric_plate_motor_get_electronic_gearing',
+                'top_dielectric_plate_steps','top_dielectric_plate_motor_get_electronic_gearing']
 #Setting cavity length to 6.3 inches for now.
 #In practice this wil be something like the_interface.get(steps)
 cavity_length_tracker = 6.3
@@ -61,7 +64,10 @@ print('Setting na_measurement_status to start_measurement')
 the_interface.set('na_measurement_status', 'start_measurement')
 
 #Logging list of endpoints
-the_interface.cmd('na_snapshot', 'log_entities')
+for entity in log_entities:
+    print("logging "+ entity)
+    the_interface.cmd(entity, "scheduled_log")
+    time.sleep(0.5)
 
 #moving curved mirror
 distance = 1 # user input + or -
@@ -92,7 +98,11 @@ the_interface.set('na_measurement_status', 'stop_measurement')
 print('Setting na_measurement_status to start_measurement')
 the_interface.set('na_measurement_status', 'start_measurement')
 print('Logging list of endpoints')
-the_interface.cmd('na_snapshot', 'log_entities')
+for entity in log_entities:
+    print("logging "+ entity)
+    the_interface.cmd(entity, "scheduled_log")
+    time.sleep(0.5)
+
 print('Setting na_measurement_status to stop_measurement')
 the_interface.set('na_measurement_status', 'stop_measurement')
 
