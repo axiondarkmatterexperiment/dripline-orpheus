@@ -108,7 +108,6 @@ for entity in log_entities:
 
 print('Setting na_measurement_status to stop_measurement')
 the_interface.set('na_measurement_status', 'stop_measurement')
-
 #stop
 print('Stopping modemap measurement')
 the_interface.set('modemap_measurement_status', 'stop_measurement')
