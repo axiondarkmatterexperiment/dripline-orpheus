@@ -27,6 +27,9 @@ for i in range(10):
     the_interface.set('curved_mirror_move_steps', n_motor_steps)
     print('Going to wait {} seconds while motor moves'.format(n_sec_wait_for_motor))
     time.sleep(n_sec_wait_for_motor)
+    the_interface.set('top_dielectric_plate_move_steps', n_motor_steps)
+    time.sleep(n_sec_wait_for_motor)
+    
     print('Setting na_measurement_status to stop_measurement')
     the_interface.set('na_measurement_status', 'stop_measurement')
 
