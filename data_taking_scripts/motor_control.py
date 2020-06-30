@@ -70,7 +70,7 @@ for entity in log_entities:
     time.sleep(n_sec_wait_for_motor)
 
 #moving curved mirror
-distance = 0.2 # user input + or -
+distance = 1 # user input + or -
 print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(distance)))
 the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(distance))
 print('moved curved mirror') #remove later
