@@ -1,22 +1,26 @@
 from dripline.core import Interface
 import time
-
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
-#time to wait for motor to move
-n_sec_wait_for_motor = 5
+#distance to move
+distance_to_move = input('Enter the distance to move in inches (Empty cavity modemap is usually 1.18): ')
+resolution = input('Enter the number of measurements needed: ')
+increment_distance = distance_to_move/resolution
 
+#time to wait for motor to move
+sleep2 = 2
+sleep5 = 5
 #move curved mirror to 0 position.
 print('Restarting motor position')
-print('This will take approximately {} seconds'.format(n_sec_wait_for_motor*3))
+print('This will take approximately {} seconds'.format(sleep5*3))
 the_interface.set('curved_mirror_move_to_position', 0)
-time.sleep(n_sec_wait_for_motor)
+time.sleep(sleep5)
 the_interface.set('bottom_dielectric_plate_move_to_position', 0)
-time.sleep(n_sec_wait_for_motor)
+time.sleep(sleep5)
 the_interface.set('top_dielectric_plate_move_to_position', 0)
-time.sleep(n_sec_wait_for_motor)
+time.sleep(sleep5)
 print('motor positions reset')
 print('')
 
@@ -46,10 +50,6 @@ def curved_mirror_distance_to_steps(distance):
     num_pitch_lengths = distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return int(round(steps))
-log_entities = ['na_start_freq' , 'na_stop_freq' , 'na_power' ,'na_averages','na_average_enable',
-                'na_s11_iq_data','na_s21_iq_data','curved_mirror_steps','curved_mirror_motor_get_electronic_gearing',
-                'bottom_dielectric_plate_steps','bottom_dielectric_plate_motor_get_electronic_gearing',
-                'top_dielectric_plate_steps','top_dielectric_plate_motor_get_electronic_gearing']
 #Setting cavity length to 6.3 inches for now.
 #In practice this wil be something like the_interface.get(steps)
 cavity_length_tracker = 6.3
@@ -59,55 +59,36 @@ initial_plate_separation = cavity_length_tracker/(num_plates+1)
 print('Starting modemap measurement')
 the_interface.set('modemap_measurement_status', 'start_measurement')
 
-#Setting na_measurement_status to start_measurement
-print('Setting na_measurement_status to start_measurement')
-the_interface.set('na_measurement_status', 'start_measurement')
+i = 0
+while i <= distance_to_move:
+    #Setting na_measurement_status to start_measurement
+    print('Setting na_measurement_status to start_measurement')
+    the_interface.set('na_measurement_status', 'start_measurement')
+    #Logging list of endpoints
+    the_interface.cmd('na_snapshot', 'log_entities')
+    #moving curved mirror
+    print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(increment_distance)))
+    the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(increment_distance))
+    time.sleep(sleep5)
+    #adjusting bottom dielectric plate
+    cavity_length_tracker = cavity_length_tracker+increment_distance
+    new_plate_separation = (cavity_length_tracker/(num_plates+1))
+    diff = initial_plate_separation + increment_distance
+    move_bottom_plate = diff - new_plate_separation #distance to move bottom dielectric plate
+    print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
+    the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
+    time.sleep(sleep5)
+    #adjusting top dielectric plate
+    move_top_plate = new_plate_separation - initial_plate_separation
+    print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
+    the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
+    time.sleep(sleep5)
+    print('Setting na_measurement_status to stop_measurement')
+    the_interface.set('na_measurement_status', 'stop_measurement')
+    time.sleep(sleep2)
+    i = i+increment_distance
+    print("now scanning distance = " +str(i))
 
-#Logging list of endpoints
-for entity in log_entities:
-    print("logging "+ entity)
-    the_interface.cmd(entity, "scheduled_log")
-    time.sleep(n_sec_wait_for_motor)
-
-#moving curved mirror
-distance = 1 # user input + or -
-print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(distance)))
-the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(distance))
-print('moved curved mirror') #remove later
-time.sleep(n_sec_wait_for_motor)
-
-cavity_length_tracker = cavity_length_tracker+distance
-new_plate_separation = (cavity_length_tracker/(num_plates+1))
-diff = initial_plate_separation + distance
-move_bottom_plate = diff - new_plate_separation #distance to move bottom dielectric plate
-
-#adjusting bottom dielectric plate
-print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
-the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
-print('moved bottom plate')#remove later
-time.sleep(n_sec_wait_for_motor)
-
-#adjusting top dielectric plate
-#move_top_plate = new_plate_separation - initial_plate_separation
-#print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
-#the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
-#print('moved top plate')#remove later
-#time.sleep(n_sec_wait_for_motor)
-
-print('Setting na_measurement_status to stop_measurement')
-the_interface.set('na_measurement_status', 'stop_measurement')
-time.sleep(n_sec_wait_for_motor)
-# taking another measurement
-print('Setting na_measurement_status to start_measurement')
-the_interface.set('na_measurement_status', 'start_measurement')
-print('Logging list of endpoints')
-for entity in log_entities:
-    print("logging "+ entity)
-    the_interface.cmd(entity, "scheduled_log")
-    time.sleep(n_sec_wait_for_motor)
-
-print('Setting na_measurement_status to stop_measurement')
-the_interface.set('na_measurement_status', 'stop_measurement')
 #stop
 print('Stopping modemap measurement')
 the_interface.set('modemap_measurement_status', 'stop_measurement')
