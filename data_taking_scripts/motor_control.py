@@ -97,7 +97,7 @@ while i <= distance_to_move:
     print('Setting na_measurement_status to stop_measurement')
     the_interface.set('na_measurement_status', 'stop_measurement')
     time.sleep(sleep2)
-    i = i+increment_distance
+    i = round((i+increment_distance),4)
     initial_plate_separation = new_plate_separation
     print("now scanning distance = " +str(i))
 
