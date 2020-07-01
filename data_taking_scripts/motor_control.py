@@ -4,6 +4,13 @@ import time
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
+#returns the sttus of the motor as a string
+def get_status():
+    bottom_plate_status = the_interface.get('bottom_dielectric_plate_motor_request_status').payload.to_python()['value_raw']
+    top_plate_status = the_interface.get('top_dielectric_plate_motor_request_status').payload.to_python()['value_raw']
+    curved_mirror_status = the_interface.get('curved_mirror_motor_request_status').payload.to_python()['value_raw']
+    return [curved_mirror_status,top_plate_status,bottom_plate_status]
+
 #distance to move
 distance_to_move = float(input('Enter the distance to move in inches (Empty cavity modemap is usually 1.18): '))
 resolution = float(input('Enter the number of measurements needed: '))
@@ -16,10 +23,12 @@ sleep5 = 5
 print('Restarting motor position')
 print('This will take approximately {} seconds'.format(sleep5*3))
 the_interface.set('curved_mirror_move_to_position', 0)
-time.sleep(sleep5)
 the_interface.set('bottom_dielectric_plate_move_to_position', 0)
-time.sleep(sleep5)
 the_interface.set('top_dielectric_plate_move_to_position', 0)
+#wait for motor. If program gets stuck check here for infinite loop
+while(get_status() != ['R', 'R', 'R']):
+    print(get_status())
+print('done with checking request. exited while loop')
 time.sleep(sleep5)
 print('motor positions reset')
 print('')
@@ -69,7 +78,6 @@ while i <= distance_to_move:
     #moving curved mirror
     print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(increment_distance)))
     the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(increment_distance))
-    time.sleep(sleep5)
     #adjusting bottom dielectric plate
     cavity_length_tracker = cavity_length_tracker+increment_distance
     new_plate_separation = (cavity_length_tracker/(num_plates+1))
@@ -77,11 +85,14 @@ while i <= distance_to_move:
     move_bottom_plate = diff - new_plate_separation #distance to move bottom dielectric plate
     print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
     the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
-    time.sleep(sleep5)
     #adjusting top dielectric plate
     move_top_plate = new_plate_separation - initial_plate_separation
     print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
     the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
+    #wait for motor. If program gets stuck check here for infinite loop
+    while(get_status() != ['R', 'R', 'R']):
+        print(get_status())
+    print('done with checking request. exited while loop')
     time.sleep(sleep5)
     print('Setting na_measurement_status to stop_measurement')
     the_interface.set('na_measurement_status', 'stop_measurement')
