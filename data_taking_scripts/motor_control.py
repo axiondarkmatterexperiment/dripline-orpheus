@@ -5,8 +5,8 @@ auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
 #distance to move
-distance_to_move = input('Enter the distance to move in inches (Empty cavity modemap is usually 1.18): ')
-resolution = input('Enter the number of measurements needed: ')
+distance_to_move = float(input('Enter the distance to move in inches (Empty cavity modemap is usually 1.18): '))
+resolution = float(input('Enter the number of measurements needed: '))
 increment_distance = distance_to_move/resolution
 
 #time to wait for motor to move
