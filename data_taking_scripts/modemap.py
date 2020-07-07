@@ -14,6 +14,7 @@ def move_motor_w_backpedaling(endpoint, total_n_motor_steps, forward_steps_per_i
         time.sleep(0.1)
         the_interface.set(endpoint, -back_steps_per_iter)
         n_steps -= back_steps_per_iter
+        time.sleep(0.1)
 
 #move curved mirror to 0 position.
 print('Restarting motor position')
