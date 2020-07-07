@@ -8,13 +8,13 @@ n_sec_wait_for_motor =10
 
 def move_motor_w_backpedaling(endpoint, total_n_motor_steps, forward_steps_per_iter, back_steps_per_iter):
     n_steps = 0
-    while n_steps < total_n_motor_steps:
+    while abs(total_n_motor_steps - n_steps) >= abs(forward_steps_per_iter):
         the_interface.set(endpoint, forward_steps_per_iter)
         n_steps += forward_steps_per_iter
-        time.sleep(0.1)
+        the_interface.set('bottom_dielectric_plate_wait_time', 1)
         the_interface.set(endpoint, -back_steps_per_iter)
         n_steps -= back_steps_per_iter
-        time.sleep(0.1)
+        the_interface.set('bottom_dielectric_plate_wait_time', 1)
 
 #move curved mirror to 0 position.
 print('Restarting motor position')
