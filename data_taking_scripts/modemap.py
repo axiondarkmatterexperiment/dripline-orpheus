@@ -3,12 +3,21 @@ import time
 
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
-n_motor_steps = 300
+n_motor_steps = 15000 
 n_sec_wait_for_motor = 3
+
+def move_motor_w_backpedaling(endpoint, total_n_motor_steps, forward_steps_per_iter, back_steps_per_iter):
+    n_steps = 0
+    while n_steps < total_n_motor_steps:
+        the_interface.set(endpoint, forward_steps_per_iter)
+        n_steps += forward_steps_per_iter
+        time.sleep(0.1)
+        the_interface.set(endpoint, -back_steps_per_iter)
+        n_steps -= back_steps_per_iter
 
 #move curved mirror to 0 position.
 print('Restarting motor position')
-the_interface.set('curved_mirror_set_position', 0)
+the_interface.set('curved_mirror_move_to_position', 0)
 print('Going to wait {} seconds while motor moves'.format(n_sec_wait_for_motor))
 time.sleep(n_sec_wait_for_motor)
 
@@ -24,7 +33,8 @@ for i in range(10):
     print('Logging list of endpoints')
     the_interface.cmd('na_snapshot', 'log_entities')
     print('Moving motor by {} steps'.format(n_motor_steps))
-    the_interface.set('curved_mirror_move_steps', n_motor_steps)
+    move_motor_w_backpedaling('curved_mirror_move_steps', n_motor_steps, 5000, 500)
+    #the_interface.set('curved_mirror_move_steps', n_motor_steps)
     print('Going to wait {} seconds while motor moves'.format(n_sec_wait_for_motor))
     time.sleep(n_sec_wait_for_motor)
     print('Setting na_measurement_status to stop_measurement')
