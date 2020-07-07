@@ -4,7 +4,7 @@ import time
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 n_motor_steps = 15000 
-n_sec_wait_for_motor = 3
+n_sec_wait_for_motor =10 
 
 def move_motor_w_backpedaling(endpoint, total_n_motor_steps, forward_steps_per_iter, back_steps_per_iter):
     n_steps = 0
