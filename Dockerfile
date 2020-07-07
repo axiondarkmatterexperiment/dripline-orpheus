@@ -1,4 +1,4 @@
-from driplineorg/dripline-python:v4.4.4-amd64
+from driplineorg/dripline-python:v4.4.5-amd64
 
 COPY . /usr/local/src/dripline-python-plugin
 
