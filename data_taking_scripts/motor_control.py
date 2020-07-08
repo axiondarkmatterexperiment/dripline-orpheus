@@ -53,13 +53,14 @@ gap = holder_center - plate_center
 
 #functions to convert distances into steps
 def plates_distance_to_steps(distance):
-    distance_in_inch = distance/25.4
-    num_pitch_lengths = distance_in_inch/pitch #these many complete rotations
+    distance = distance/25.4 ##convert to inch
+    actual_distance = distance + gap
+    num_pitch_lengths = actual_distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return int(round(steps))
 def curved_mirror_distance_to_steps(distance):
-    distance_in_inch = distance/25.4
-    num_pitch_lengths = distance_in_inch/pitch #these many complete rotations
+    distance = distance/25.4 ##convert to inch
+    num_pitch_lengths = distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return int(round(steps))
 def bottom_dielectric_dist(cavity_len, incr, initial_separation):
