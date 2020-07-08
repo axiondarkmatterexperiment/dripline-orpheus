@@ -10,7 +10,11 @@ def get_status():
     top_plate_status = the_interface.get('top_dielectric_plate_motor_request_status').payload.to_python()['value_raw']
     curved_mirror_status = the_interface.get('curved_mirror_motor_request_status').payload.to_python()['value_raw']
     return [curved_mirror_status,top_plate_status,bottom_plate_status]
-
+def wait_for_motors():
+    while (get_status() != ['R','R','R']):
+        print(get_status())
+        time.sleep(1)
+    print('done waiting')
 #distance to move
 print("PLEASE ENTER DISTANCE IN MILLIMETERS (mm)")
 distance_to_move = float(input('Enter the distance to move in mm (Empty cavity modemap is usually 30): '))
@@ -28,14 +32,9 @@ the_interface.set('curved_mirror_move_to_position', 0)
 the_interface.set('bottom_dielectric_plate_move_to_position', 0)
 the_interface.set('top_dielectric_plate_move_to_position', 0)
 #wait for motor. If program gets stuck check here for infinite loop
-while(get_status() != ['R', 'R', 'R']):
-    print(get_status())
-    time.sleep(1)
-print('done with checking request. exited while loop')
+wait_for_motors()
 time.sleep(sleep5)
 print('motor positions reset')
-print('')
-
 #all units are in inches
 #holder info
 plate_thickness = 1/8
@@ -71,7 +70,6 @@ def bottom_dielectric_dist(cavity_len, incr, initial_separation):
     move_bottom_plate = diff - new_separation
     return move_bottom_plate, new_separation, cavity_len
 
-
 #Setting cavity length to 6.3 inches for now.
 #In practice this wil be something like the_interface.get(steps)
 cavity_length_tracker = 6.3
@@ -102,12 +100,9 @@ while i <= distance_to_move:
     print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
     the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
     #wait for motor. If program gets stuck check here for infinite loop
-    while(get_status() != ['R', 'R', 'R']):
-        print(get_status())
-        time.sleep(1)
-    print('done with checking request. exited while loop')
-    initial_plate_separation = new_plate_separation
+    wait_for_motors()
     time.sleep(sleep5)
+    initial_plate_separation = new_plate_separation
     #backpedalling
     print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(back_increment)))
     the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(back_increment))
@@ -118,13 +113,8 @@ while i <= distance_to_move:
     move_top_plate = new_plate_separation - initial_plate_separation
     print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
     the_interface.set('top_dielectric_plate_move_steps', plates_distance_to_steps(move_top_plate))
-
     #wait for motor. If program gets stuck check here for infinite loop
-    while(get_status() != ['R', 'R', 'R']):
-        print(get_status())
-        time.sleep(1)
-    print('done with checking request. exited while loop')
-
+    wait_for_motors()
     time.sleep(sleep2)
     i = round((i+forward_increment+back_increment),4)
     initial_plate_separation = new_plate_separation
