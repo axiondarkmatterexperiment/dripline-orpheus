@@ -30,6 +30,7 @@ the_interface.set('top_dielectric_plate_move_to_position', 0)
 #wait for motor. If program gets stuck check here for infinite loop
 while(get_status() != ['R', 'R', 'R']):
     print(get_status())
+    time.sleep(1)
 print('done with checking request. exited while loop')
 time.sleep(sleep5)
 print('motor positions reset')
@@ -87,6 +88,8 @@ while i <= distance_to_move:
     the_interface.set('na_measurement_status', 'start_measurement')
     #Logging list of endpoints
     the_interface.cmd('na_snapshot', 'log_entities')
+    print('Setting na_measurement_status to stop_measurement')
+    the_interface.set('na_measurement_status', 'stop_measurement')
     #moving curved mirror
     print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(forward_increment)))
     the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(forward_increment))
@@ -101,6 +104,7 @@ while i <= distance_to_move:
     #wait for motor. If program gets stuck check here for infinite loop
     while(get_status() != ['R', 'R', 'R']):
         print(get_status())
+        time.sleep(1)
     print('done with checking request. exited while loop')
     initial_plate_separation = new_plate_separation
     time.sleep(sleep5)
@@ -118,10 +122,9 @@ while i <= distance_to_move:
     #wait for motor. If program gets stuck check here for infinite loop
     while(get_status() != ['R', 'R', 'R']):
         print(get_status())
+        time.sleep(1)
     print('done with checking request. exited while loop')
 
-    print('Setting na_measurement_status to stop_measurement')
-    the_interface.set('na_measurement_status', 'stop_measurement')
     time.sleep(sleep2)
     i = round((i+forward_increment+back_increment),4)
     initial_plate_separation = new_plate_separation
