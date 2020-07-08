@@ -13,7 +13,7 @@ def get_status():
 
 #distance to move
 print("PLEASE ENTER DISTANCE IN MILLIMETERS (mm)")
-distance_to_move = float(input('Enter the distance to move in inches (Empty cavity modemap is usually 1.18): '))
+distance_to_move = float(input('Enter the distance to move in mm (Empty cavity modemap is usually 30): '))
 resolution = float(input('Enter the number of measurements needed: '))
 increment_distance = distance_to_move/resolution
 forward_increment = increment_distance+increment_distance/2
@@ -107,7 +107,7 @@ while i <= distance_to_move:
     print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(back_increment)))
     the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(back_increment))
     move_bottom_plate, new_plate_separation, cavity_length_tracker = bottom_dielectric_dist(cavity_length_tracker, back_increment, initial_plate_separation)
-    the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(move_bottom_plate))
+    the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
     #adjusting top dielectric plate
     move_top_plate = new_plate_separation - initial_plate_separation
     print('Moving top plate motor by {} steps'.format(plates_distance_to_steps(move_top_plate)))
