@@ -108,6 +108,7 @@ while i <= distance_to_move:
     print('Moving curved mirror motor by {} steps'.format(curved_mirror_distance_to_steps(back_increment)))
     the_interface.set('curved_mirror_move_steps', curved_mirror_distance_to_steps(back_increment))
     move_bottom_plate, new_plate_separation, cavity_length_tracker = bottom_dielectric_dist(cavity_length_tracker, back_increment, initial_plate_separation)
+    print('Moving bottom plate motor by {} steps'.format(plates_distance_to_steps(move_bottom_plate)))
     the_interface.set('bottom_dielectric_plate_move_steps', plates_distance_to_steps(move_bottom_plate))
     #adjusting top dielectric plate
     move_top_plate = new_plate_separation - initial_plate_separation
