@@ -52,7 +52,7 @@ while i <= distance_to_move:
     print('Moving top plate motor by {} steps'.format(common_functions.plates_distance_to_steps(move_top_plate)))
     the_interface.set('top_dielectric_plate_move_steps',common_functions.plates_distance_to_steps(move_top_plate))
     #wait for motor. If program gets stuck check here for infinite loop
-    wait_for_motors()
+    common_functions.wait_for_motors()
     time.sleep(sleep4)
     i = round((i+increment_distance),4)
     initial_plate_separation = new_plate_separation
