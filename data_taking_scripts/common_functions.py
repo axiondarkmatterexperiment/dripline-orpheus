@@ -46,7 +46,7 @@ def wait_for_motors():
         time.sleep(1)
     print('done waiting')
 
-def move_motors_to_zero(list_of_motors,0):
+def move_motors_to_zero(list_of_motors):
     for motor_command in list_of_motors:
         the_interface.set(motor_command, 0)
 
