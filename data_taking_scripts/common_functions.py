@@ -9,7 +9,6 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 plate_thickness = 1/8
 lip_thickness = 0.05
 holder_thickness = 1/4
-num_plates = 4
 
 # motor and rod info
 pitch = 1/20 #pitch of threaded rods

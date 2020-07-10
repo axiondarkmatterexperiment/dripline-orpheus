@@ -27,6 +27,7 @@ print('motor positions reset')
 #Setting cavity length to 6.3 inches for now.
 #In practice this wil be something like the_interface.get(steps)
 cavity_length_tracker = 6.3
+num_plates = 4
 initial_plate_separation = cavity_length_tracker/(num_plates+1)
 
 #Send alert saying you are starting the modemap measurement
@@ -53,7 +54,7 @@ while i <= distance_to_move:
     #wait for motor. If program gets stuck check here for infinite loop
     wait_for_motors()
     time.sleep(sleep4)
-    i = round((i+forward_increment+back_increment),4)
+    i = round((i+increment_distance),4)
     initial_plate_separation = new_plate_separation
     print("now scanning distance = " +str(i))
 
