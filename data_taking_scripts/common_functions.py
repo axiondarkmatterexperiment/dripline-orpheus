@@ -4,30 +4,18 @@ import time
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
-#all units are in inches
-#holder info
-plate_thickness = 1/8
-lip_thickness = 0.05
-holder_thickness = 1/4
-
-# motor and rod info
-pitch = 1/20 #pitch of threaded rods
-steps_per_rotation = 20000 #motor specification
-
-#some necessary computations
-holder_center = holder_thickness/2
-plate_center = lip_thickness + plate_thickness/2
-gap = holder_center - plate_center
-
+def plate_separation(length, num_plates):
+    return length/(num_plates+1)
 #functions to convert distances into steps
-def plates_distance_to_steps(distance):
-    distance = distance/25.4 ##convert to inch
+def plates_distance_to_steps(distance,holder_thickness,plate_thickness,lip_thickness,pitch=(1/20), steps_per_rotation = 20000):
+    holder_center = holder_thickness/2
+    plate_center = lip_thickness + plate_thickness/2
+    gap = holder_center - plate_center
     actual_distance = distance + gap
     num_pitch_lengths = actual_distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return int(round(steps))
-def curved_mirror_distance_to_steps(distance):
-    distance = distance/25.4 ##convert to inch
+def curved_mirror_distance_to_steps(distance, pitch = (1/20), steps_per_rotation = 20000):
     num_pitch_lengths = distance/pitch #these many complete rotations
     steps = steps_per_rotation * num_pitch_lengths
     return int(round(steps))
