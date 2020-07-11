@@ -6,10 +6,18 @@ class Motor:
         self.name = name
         self.cmd_interface = Interface(dripline_config={'auth-file': self.auths_file})
 
+    def get_name(self):
+        return self.name
+
     def get_status(self):
         command = F"{self.name}_motor_request_status"
         status = self.cmd_interface.get(command).payload.to_python()['value_raw']
         return status
+
+    def wait_for_motor(self):
+        while get_status() != 'R':
+            print(get_status())
+            time.sleep(1)
 
     def move_to_zero(self):
         command = F"{self.name}_move_to_position"
@@ -19,6 +27,7 @@ class Motor:
         command = F"{self.name}_move_steps"
         self.cmd_interface.set(command,steps)
 
+# using the classes below is recommended. 
 class CurvedMirrorMotor(Motor):
     def __init__(self, auths_file):
         super().__init__(auths_file, 'curved_mirror')
