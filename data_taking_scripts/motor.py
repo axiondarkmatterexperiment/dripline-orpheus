@@ -4,7 +4,7 @@ class Motor:
     def __init__(self,auths_file,name):
         self.auths_file = auths_file
         self.name = name
-        self.cmd_interface = Interface(dripline_config={'auth-file': self._auths_file})
+        self.cmd_interface = Interface(dripline_config={'auth-file': self.auths_file})
 
     def get_status(self):
         command = F"{self.name}_motor_request_status"
