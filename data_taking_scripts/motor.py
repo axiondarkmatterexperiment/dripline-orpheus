@@ -21,15 +21,15 @@ class Motor:
 
 class CurvedMirrorMotor(Motor):
     def __init__(self, auths_file):
-        super().__init__(self, auths_file, 'curved_mirror')
+        super().__init__(auths_file, 'curved_mirror')
 
 class BottomDielectricPlateMotor(Motor):
     def __init__(self, auths_file):
-        super().__init__(self, auths_file, 'bottom_dielectric_plate')
+        super().__init__(auths_file, 'bottom_dielectric_plate')
 
 class TopDielectricPlateMotor(Motor):
     def __init__(self, auths_file):
-        super().__init__(self, auths_file, 'top_dielectric_plate')
+        super().__init__(auths_file, 'top_dielectric_plate')
 
 class OrpheusMotors:
     def __init__(self,auths_file):
