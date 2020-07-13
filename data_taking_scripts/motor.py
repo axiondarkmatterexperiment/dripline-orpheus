@@ -100,6 +100,11 @@ class OrpheusMotors:
 
     def move_by_increment(self, increment_distance, dielectric_plate_thickness,
                           cavity_length_tracker, num_plates):
+        ''' Moves all three motor in a coordinated manner.
+            Keeps the dielectric plates even spaced.
+            Returns the new resonator length and the new separation
+            between the plates. '''
+
         curved_mirror_steps = curved_mirror_distance_to_steps(increment_distance)
         print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
         self.curved_mirror.move_steps(curved_mirror_steps)
@@ -119,11 +124,15 @@ class OrpheusMotors:
         return cavity_length_tracker, new_plate_separation
 
     def plate_separation(self, length, num_plates):
+        ''' Returns the new plate separation between the dielectrics. '''
         return length/(num_plates+1)
 
     def plates_distance_to_steps(distance,plate_thickness,holder_thickness = (1/4),
                                  lip_thickness = (1/20),pitch=(1/20),
                                  steps_per_rotation = 20000):
+        ''' Returns the number of steps to move the alumina holders
+            based on the distance teh plates need to move. Takes plate_thickness
+            and the distance as input and returns an integer as output. '''
         holder_center = holder_thickness/2
         plate_center = lip_thickness + plate_thickness/2
         gap = holder_center - plate_center
@@ -133,6 +142,8 @@ class OrpheusMotors:
         return int(round(steps))
 
     def curved_mirror_distance_to_steps(distance, pitch = (1/20), steps_per_rotation = 20000):
+        ''' Returns the number of steps that curved mirror needs to move based on the
+            distance. '''
         num_pitch_lengths = distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
