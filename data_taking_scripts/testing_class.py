@@ -6,7 +6,7 @@ auths_file = '/etc/rabbitmq-secret/authentications.json'
 cavity_length_tracker = cm_to_inch(float(input('Enter initial resonator length (in cm): ')))
 distance_to_move = float(input('Enter the distance to move in cm (Empty cavity modemap is usually 3): '))
 resolution = float(input('Enter the number of measurements needed: '))
-increment_distance = distance_to_move/resolution
+increment_distance = cm_to_inch(distance_to_move/resolution)
 
 def cm_to_inch(dist):
     return dist/2.54
@@ -26,7 +26,7 @@ top_plate = orpheus_motors.top_plate()
 
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
-initial_plate_separation = logger.plate_separation(cavity_length_tracker,num_plates)
+initial_plate_separation = orpheus_motors.plate_separation(cavity_length_tracker,num_plates)
 
 #Send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
@@ -35,7 +35,6 @@ i = 0
 while i <= distance_to_move:
     logger.log_modemap(sleep4) #parameter - time allowed for averaging
     #moving curved mirror
-    increment_distance = cm_to_inch(increment_distance)
     cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
                                                                                    cavity_length_tracker,
