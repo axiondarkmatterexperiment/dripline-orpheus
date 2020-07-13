@@ -50,3 +50,9 @@ def data_logging_sequence(a_sec_wait_for_na_averaging):
     the_interface.cmd('na_s11_iq_data', 'scheduled_log')
     print('Setting na_measurement_status to stop_measurement')
     the_interface.set('na_measurement_status', 'stop_measurement')
+
+def start_modemap():
+    the_interface.set('modemap_measurement_status', 'start_measurement')
+
+def stop_modemap():
+    the_interface.set('modemap_measurement_status', 'stop_measurement')
