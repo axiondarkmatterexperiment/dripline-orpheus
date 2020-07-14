@@ -88,7 +88,7 @@ class OrpheusMotors:
         ''' Waits for all three motors to stop moving and ready to
             accept commands. '''
         while (self.get_motor_status() != ['R','R','R']):
-            print(get_motor_status())
+            print(self.get_motor_status())
             time.sleep(1)
         print('done waiting')
 
@@ -110,15 +110,15 @@ class OrpheusMotors:
         self.curved_mirror.move_steps(curved_mirror_steps)
         #adjusting bottom dielectric plate
         cavity_length_tracker = cavity_length_tracker + increment_distance
-        new_plate_separation = plate_separation(cavity_length_tracker,num_plates)
+        new_plate_separation = self.plate_separation(cavity_length_tracker,num_plates)
         diff = initial_plate_separation +increment_distance
         move_bottom_plate = diff - new_plate_separation
-        bottom_plate_steps = plates_distance_to_steps(move_bottom_plate,dielectric_plate_thickness)
+        bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,dielectric_plate_thickness)
         print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
         self.bottom_plate.move_steps(bottom_plate_steps)
         #adjusting top dielectric plate
         move_top_plate = new_plate_separation - initial_plate_separation
-        top_plate_steps = plates_distance_to_steps(move_top_plate,dielectric_plate_thickness)
+        top_plate_steps = self.plates_distance_to_steps(move_top_plate,dielectric_plate_thickness)
         print(F'Moving top plate motor by {top_plate_steps} steps')
         self.top_plate.move_steps(top_plate_steps)
         return cavity_length_tracker, new_plate_separation
