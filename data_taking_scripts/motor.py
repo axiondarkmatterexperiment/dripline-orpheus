@@ -60,6 +60,13 @@ class TopDielectricPlateMotor(Motor):
     def __init__(self, auths_file):
         super().__init__(auths_file, 'top_dielectric_plate')
 
+class TestMotor(Motor):
+    ''' Creates a motor object for the top_dielectric_plate.
+        Inherits the Motor class and thus has access to all
+        its methods. '''
+    def __init__(self, auths_file):
+        super().__init__(auths_file, 'resonator_coupling')
+
 class OrpheusMotors:
     ''' Creates Motor objects for Orpheus as a whole. '''
     def __init__(self,auths_file):
