@@ -87,7 +87,7 @@ class OrpheusMotors:
     def wait_for_motors(self):
         ''' Waits for all three motors to stop moving and ready to
             accept commands. '''
-        while (get_motor_status() != ['R','R','R']):
+        while (self.get_motor_status() != ['R','R','R']):
             print(get_motor_status())
             time.sleep(1)
         print('done waiting')
@@ -105,7 +105,7 @@ class OrpheusMotors:
             Returns the new resonator length and the new separation
             between the plates. '''
 
-        curved_mirror_steps = curved_mirror_distance_to_steps(increment_distance)
+        curved_mirror_steps = self.curved_mirror_distance_to_steps(increment_distance)
         print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
         self.curved_mirror.move_steps(curved_mirror_steps)
         #adjusting bottom dielectric plate

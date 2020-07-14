@@ -3,15 +3,16 @@ from dripline_logger import DriplineLogger
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
+def cm_to_inch(dist):
+    return dist/2.54
+def inch_to_cm(dist):
+    return dist*2.54
+
 cavity_length_tracker = cm_to_inch(float(input('Enter initial resonator length (in cm): ')))
 distance_to_move = float(input('Enter the distance to move in cm (Empty cavity modemap is usually 3): '))
 resolution = float(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
-def cm_to_inch(dist):
-    return dist/2.54
-def inch_to_cm(dist):
-    return dist*2.54
 #time to wait
 sleep4 = 4
 #important parameters. all units are in inches
@@ -20,9 +21,9 @@ num_plates = 4
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file)
 logger = DriplineLogger(auths_file)
-curved_mirror = orpheus_motors.curved_mirror()
-bottom_plate = orpheus_motors.bottom_plate()
-top_plate = orpheus_motors.top_plate()
+curved_mirror = orpheus_motors.curved_mirror
+bottom_plate = orpheus_motors.bottom_plate
+top_plate = orpheus_motors.top_plate
 
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
