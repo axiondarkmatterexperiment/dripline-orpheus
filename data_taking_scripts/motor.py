@@ -24,8 +24,8 @@ class Motor:
 
     def wait_for_motor(self):
         ''' Waits for a motor to stop moving and ready to accept a command. '''
-        while get_status() != 'R':
-            print(get_status())
+        while self.get_status() != 'R':
+            print(self.get_status())
             time.sleep(1)
 
     def move_to_zero(self):
