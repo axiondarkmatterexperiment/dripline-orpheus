@@ -127,7 +127,7 @@ class OrpheusMotors:
         ''' Returns the new plate separation between the dielectrics. '''
         return length/(num_plates+1)
 
-    def plates_distance_to_steps(distance,plate_thickness,holder_thickness = (1/4),
+    def plates_distance_to_steps(self,distance,plate_thickness,holder_thickness = (1/4),
                                  lip_thickness = (1/20),pitch=(1/20),
                                  steps_per_rotation = 20000):
         ''' Returns the number of steps to move the alumina holders
@@ -141,7 +141,7 @@ class OrpheusMotors:
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
 
-    def curved_mirror_distance_to_steps(distance, pitch = (1/20), steps_per_rotation = 20000):
+    def curved_mirror_distance_to_steps(self,distance, pitch = (1/20), steps_per_rotation = 20000):
         ''' Returns the number of steps that curved mirror needs to move based on the
             distance. '''
         num_pitch_lengths = distance/pitch #these many complete rotations
