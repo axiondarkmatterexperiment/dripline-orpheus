@@ -39,7 +39,8 @@ while i <= distance_to_move:
     cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
                                                                                    cavity_length_tracker,
-                                                                                   num_plates)
+                                                                                   num_plates,
+                                                                                   initial_plate_separation)
     #wait for motor. If program gets stuck check here for infinite loop
     orpheus_motors.wait_for_motors()
     i = round((i+inch_to_cm(increment_distance)),4)
