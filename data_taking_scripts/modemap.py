@@ -38,6 +38,7 @@ def move_motor_w_backpedaling(endpoint, total_n_motor_steps, forward_steps_per_i
 #move curved mirror to 0 position.
 print('Restarting motor position')
 the_interface.set('curved_mirror_move_to_position', 0)
+the_interface.set('bottom_dielectric_plate_move_to_position', 0)
 print('Going to wait while motor moves')
 common_functions.wait_for_motors()
 
@@ -57,4 +58,5 @@ for i in range(n_measurements):
 print('Stopping modemap measurement')
 the_interface.set('modemap_measurement_status', 'stop_measurement')
 
-the_interface.set('bottom_dielectric_plate_move_steps', 3*n_motor_steps)
+print('Moving top dielectric plate by {} steps'.format((3*n_motor_steps)))
+the_interface.set('top_dielectric_plate_move_steps', 3*n_motor_steps)
