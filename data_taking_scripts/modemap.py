@@ -56,3 +56,5 @@ for i in range(n_measurements):
 
 print('Stopping modemap measurement')
 the_interface.set('modemap_measurement_status', 'stop_measurement')
+
+the_interface.set('bottom_dielectric_plate_move_steps', 3*n_motor_steps)
