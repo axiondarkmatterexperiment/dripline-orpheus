@@ -99,7 +99,7 @@ class OrpheusMotors:
         self.top_plate.move_to_zero()
 
     def move_by_increment(self, increment_distance, dielectric_plate_thickness,
-                          cavity_length_tracker, num_plates):
+                          cavity_length_tracker, num_plates, initial_plate_separation):
         ''' Moves all three motor in a coordinated manner.
             Keeps the dielectric plates even spaced.
             Returns the new resonator length and the new separation
