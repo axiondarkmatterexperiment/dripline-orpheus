@@ -4,6 +4,13 @@ import time
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
+def initialize_na_settings_for_modemap(start_freq = 15e9, stop_freq = 18e9, power = -5 , averages = 0, sweep_points = 10001):
+    the_interface.set('na_start_freq', start_freq)
+    the_interface.set('na_stop_freq', stop_freq)
+    the_interface.set('na_power', power)
+    the_interface.set('na_averages', averages)
+    the_interface.set('na_sweep_points', sweep_points)
+
 def plate_separation(length, num_plates):
     return length/(num_plates+1)
 #functions to convert distances into steps
