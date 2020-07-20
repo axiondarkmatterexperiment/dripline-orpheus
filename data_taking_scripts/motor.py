@@ -69,41 +69,45 @@ class TestMotor(Motor):
 
 class OrpheusMotors:
     ''' Creates Motor objects for Orpheus as a whole. '''
-    def __init__(self,auths_file):
+    def __init__(self,auths_file, list_of_motors = []):
         self.auths_file = auths_file
-        self.curved_mirror = CurvedMirrorMotor(self.auths_file)
-        self.bottom_plate = BottomDielectricPlateMotor(self.auths_file)
-        self.top_plate = TopDielectricPlateMotor(self.auths_file)
-
-    def curved_mirror(self):
-        return self.curved_mirror
-
-    def bottom_plate(self):
-        return self.bottom_plate
-
-    def top_plate(self):
-        return self.top_plate
+        self.list_of_motors = set(list_of_motors)
+        self.motors = []
+        for motor in self.list_of_motors:
+            if motor == 'curved_mirror':
+                self.curved_mirror = CurvedMirrorMotor(self.auths_file)
+                self.motors.append(self.curved_mirror)
+            elif motor == 'bottom_dielectric_plate':
+                self.bottom_plate = BottomDielectricPlateMotor(self.auths_file)
+                self.motors.append(self.bottom_plate)
+            elif motor == 'top_dielectric_plate':
+                self.top_plate = TopDielectricPlateMotor(self.auths_file)
+                self.motors.append(self.top_plate)
+            else:
+                pass
+        self.motor_names = [motor.get_name() for motor in self.motors]
 
     def get_motor_status(self):
         ''' Returns the status of all 3 motors as a list. '''
-        curved_mirror_status = self.curved_mirror.get_status()
-        bottom_plate_status = self.bottom_plate.get_status()
-        top_plate_status = self.top_plate.get_status()
-        return [curved_mirror_status, bottom_plate_status, top_plate_status]
+        status = []
+        for motor in self.motors:
+            status.append(motor.get_status())
+        return status
 
     def wait_for_motors(self):
         ''' Waits for all three motors to stop moving and ready to
             accept commands. '''
-        while (self.get_motor_status() != ['R','R','R']):
+        print(self.motor_names)
+        ready = len(self.motor_names)*['R']
+        while (self.get_motor_status() != ready):
             print(self.get_motor_status())
             time.sleep(1)
         print('done waiting')
 
     def move_to_zero(self):
         ''' Moves all three motors to 0. '''
-        self.curved_mirror.move_to_zero()
-        self.bottom_plate.move_to_zero()
-        self.top_plate.move_to_zero()
+        for motor in self.motors:
+            motor.move_to_zero()
 
     def move_by_increment(self, increment_distance, dielectric_plate_thickness,
                           cavity_length_tracker, num_plates, initial_plate_separation):
@@ -112,22 +116,30 @@ class OrpheusMotors:
             Returns the new resonator length and the new separation
             between the plates. '''
 
-        curved_mirror_steps = self.curved_mirror_distance_to_steps(increment_distance)
-        print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
-        self.curved_mirror.move_steps(curved_mirror_steps)
-        #adjusting bottom dielectric plate
         cavity_length_tracker = cavity_length_tracker + increment_distance
         new_plate_separation = self.plate_separation(cavity_length_tracker,num_plates)
-        diff = initial_plate_separation +increment_distance
-        move_bottom_plate = diff - new_plate_separation
-        bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,dielectric_plate_thickness)
-        print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
-        self.bottom_plate.move_steps(bottom_plate_steps)
-        #adjusting top dielectric plate
-        move_top_plate = new_plate_separation - initial_plate_separation
-        top_plate_steps = self.plates_distance_to_steps(move_top_plate,dielectric_plate_thickness)
-        print(F'Moving top plate motor by {top_plate_steps} steps')
-        self.top_plate.move_steps(top_plate_steps)
+
+        if 'curved_mirror' in self.motor_names:
+            cm_ind = self.motor_names.index('curved_mirror')
+            curved_mirror_steps = self.curved_mirror_distance_to_steps(increment_distance)
+            print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
+            self.motors[cm_ind].move_steps(curved_mirror_steps)
+
+        if 'bottom_dielectric_plate' in self.motor_names:
+            bdp_ind = self.motor_names.index('bottom_dielectric_plate')
+            diff = initial_plate_separation +increment_distance
+            move_bottom_plate = diff - new_plate_separation
+            bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,dielectric_plate_thickness)
+            print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
+            self.motors[bdp_ind].move_steps(bottom_plate_steps)
+
+        if 'top_dielectric_plate' in self.motor_names:
+            tdp_ind = self.motor_names.index('top_dielectric_plate')
+            move_top_plate = new_plate_separation - initial_plate_separation
+            top_plate_steps = self.plates_distance_to_steps(move_top_plate,dielectric_plate_thickness)
+            print(F'Moving top plate motor by {top_plate_steps} steps')
+            self.motors[tdp_ind].move_steps(top_plate_steps)
+
         return cavity_length_tracker, new_plate_separation
 
     def plate_separation(self, length, num_plates):
