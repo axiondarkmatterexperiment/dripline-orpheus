@@ -1,5 +1,5 @@
 from motor import OrpheusMotors
-from dripline_logger import DriplineLogger
+from data_logging import DataLogger
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
@@ -23,8 +23,9 @@ plate_thickness = 1/8
 num_plates = 4
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
-logger = DriplineLogger(auths_file)
+logger = DataLogger(auths_file)
 
+logger.initialize_na_settings_for_modemap(averages = 64)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 initial_plate_separation = orpheus_motors.plate_separation(cavity_length_tracker,num_plates)
@@ -35,13 +36,11 @@ logger.start_modemap()
 i = 0
 while i <= distance_to_move:
     logger.log_modemap(sleep4) #parameter - time allowed for averaging
-    #moving curved mirror
     cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
                                                                                    cavity_length_tracker,
                                                                                    num_plates,
                                                                                    initial_plate_separation)
-    #wait for motor. If program gets stuck check here for infinite loop
     orpheus_motors.wait_for_motors()
     i = round((i+inch_to_cm(increment_distance)),4)
     initial_plate_separation = new_plate_separation
