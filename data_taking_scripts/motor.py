@@ -68,7 +68,8 @@ class TestMotor(Motor):
         super().__init__(auths_file, 'resonator_coupling')
 
 class OrpheusMotors:
-    ''' Creates Motor objects for Orpheus as a whole. '''
+    ''' Creates Motor objects for Orpheus.
+        Takes an auth-file and a list of motors as input.'''
     def __init__(self,auths_file, list_of_motors = []):
         self.auths_file = auths_file
         self.list_of_motors = set(list_of_motors)
@@ -88,15 +89,15 @@ class OrpheusMotors:
         self.motor_names = [motor.get_name() for motor in self.motors]
 
     def get_motor_status(self):
-        ''' Returns the status of all 3 motors as a list. '''
+        ''' Returns the status of the initialized motors as a list. '''
         status = []
         for motor in self.motors:
             status.append(motor.get_status())
         return status
 
     def wait_for_motors(self):
-        ''' Waits for all three motors to stop moving and ready to
-            accept commands. '''
+        ''' Waits for all the initialized motors to stop moving
+            and ready to accept commands. '''
         print(self.motor_names)
         ready = len(self.motor_names)*['R']
         while (self.get_motor_status() != ready):
@@ -105,16 +106,17 @@ class OrpheusMotors:
         print('done waiting')
 
     def move_to_zero(self):
-        ''' Moves all three motors to 0. '''
+        ''' Moves the motors to 0. '''
         for motor in self.motors:
             motor.move_to_zero()
 
     def move_by_increment(self, increment_distance, dielectric_plate_thickness,
                           cavity_length_tracker, num_plates, initial_plate_separation):
-        ''' Moves all three motor in a coordinated manner.
+        ''' Moves initialized motors in a coordinated manner.
             Keeps the dielectric plates even spaced.
             Returns the new resonator length and the new separation
-            between the plates. '''
+            between the plates.
+            All distance/lengths should be in inches.  '''
 
         cavity_length_tracker = cavity_length_tracker + increment_distance
         new_plate_separation = self.plate_separation(cavity_length_tracker,num_plates)
@@ -150,8 +152,9 @@ class OrpheusMotors:
                                  lip_thickness = (1/20),pitch=(1/20),
                                  steps_per_rotation = 20000):
         ''' Returns the number of steps to move the alumina holders
-            based on the distance teh plates need to move. Takes plate_thickness
-            and the distance as input and returns an integer as output. '''
+            based on the distance the plates need to move. Takes plate_thickness
+            and the distance as input and returns an integer as output.
+            Input distance in inches. '''
         holder_center = holder_thickness/2
         plate_center = lip_thickness + plate_thickness/2
         gap = holder_center - plate_center
@@ -162,7 +165,8 @@ class OrpheusMotors:
 
     def curved_mirror_distance_to_steps(self,distance, pitch = (1/20), steps_per_rotation = 20000):
         ''' Returns the number of steps that curved mirror needs to move based on the
-            distance. '''
+            distance.
+            Input distance in inches. '''
         num_pitch_lengths = distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
