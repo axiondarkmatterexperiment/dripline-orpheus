@@ -49,11 +49,22 @@ def data_logging_sequence(a_sec_wait_for_na_averaging):
     the_interface.set('na_measurement_status', 'start_measurement')
     print('Logging list of endpoints')
     the_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+
+    # switch the na to read s21
     the_interface.get('na_s21_iq_data')
+    #  autoscale the window so that the s21 data fits. This is so I can watch the data while it's being recorded.
+    the_interface.set('na_commands', 'autoscale')
+    #wait for network analyzer to finish several sweeps for averaging
     time.sleep(a_sec_wait_for_na_averaging)
+    # then record s21 data into database
     the_interface.cmd('na_s21_iq_data', 'scheduled_log')
+    # switch the na to read s11
     the_interface.get('na_s11_iq_data')
+    #  autoscale the window so that the s11 data fits. This is so I can watch the data while it's being recorded.
+    the_interface.set('na_commands', 'autoscale')
+    #wait for network analyzer to finish several sweeps for averaging
     time.sleep(a_sec_wait_for_na_averaging)
+    # then record s11 data into database
     the_interface.cmd('na_s11_iq_data', 'scheduled_log')
     print('Setting na_measurement_status to stop_measurement')
     the_interface.set('na_measurement_status', 'stop_measurement')
