@@ -38,6 +38,11 @@ class Motor:
         command = F"{self.name}_move_steps"
         self.cmd_interface.set(command,steps)
 
+    def stop_and_kill(self):
+        ''' Tells motors to stop ASAP. '''
+        command = F"{self.name}_status_command"
+        self.cmd_interface.set(command, 'stop_and_kill')
+
 # using the classes below is recommended.
 class CurvedMirrorMotor(Motor):
     ''' Creates a motor object for the curved mirror.
@@ -143,6 +148,10 @@ class OrpheusMotors:
             self.motors[tdp_ind].move_steps(top_plate_steps)
 
         return cavity_length_tracker, new_plate_separation
+
+    def stop_and_kill(self):
+        for motor in self.motors:
+            motor.stop_and_kill()
 
     def plate_separation(self, length, num_plates):
         ''' Returns the new plate separation between the dielectrics. '''

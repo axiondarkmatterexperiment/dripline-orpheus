@@ -33,18 +33,22 @@ initial_plate_separation = orpheus_motors.plate_separation(cavity_length_tracker
 #Send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
 logger.start_modemap()
-i = 0
-while i <= distance_to_move:
-    logger.log_modemap(sleep4) #parameter - time allowed for averaging
-    cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
+
+try:
+    i = 0
+    while i <= distance_to_move:
+        logger.log_modemap(sleep4) #parameter - time allowed for averaging
+        cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
                                                                                    cavity_length_tracker,
                                                                                    num_plates,
                                                                                    initial_plate_separation)
-    orpheus_motors.wait_for_motors()
-    i = round((i+inch_to_cm(increment_distance)),4)
-    initial_plate_separation = new_plate_separation
-    print("now scanning distance = " +str(i))
-#stop
-print('Stopping modemap measurement')
-logger.stop_modemap()
+        orpheus_motors.wait_for_motors()
+        i = round((i+inch_to_cm(increment_distance)),4)
+        initial_plate_separation = new_plate_separation
+        print("now scanning distance = " +str(i))
+
+except KeyboardInterrupt:
+    print('stopping motors and modemap measurement')
+    orpheus_motors.stop_and_kill()
+    logger.stop_modemap()
