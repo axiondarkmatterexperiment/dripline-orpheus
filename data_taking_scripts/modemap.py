@@ -13,6 +13,9 @@ import common_functions
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 the_interface = Interface(dripline_config={'auth-file': auths_file})
 
+#  ask about notes for current measurement. The user would type in what they want to remember about their current measurement.
+measurement_notes = input('Notes about current measurement: ')
+
 ### configure na ####
 na_start_freq = 15e9
 na_stop_freq = 18e9
@@ -54,6 +57,8 @@ common_functions.wait_for_motors()
 #send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
 the_interface.set('modemap_measurement_status', 'start_measurement')
+the_interface.set('modemap_measurement_status_explanation', measurement_notes)
+
 
 for i in range(n_measurements):
     print('Iteration in loop: {}'.format(i))
