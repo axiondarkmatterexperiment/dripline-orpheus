@@ -36,7 +36,7 @@ logger.start_modemap()
 
 try:
     i = 0
-    while i <= distance_to_move:
+    while i <= abs(distance_to_move):
         logger.log_modemap(sec_wait_for_na_averaging) #parameter - time allowed for averaging
         cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
