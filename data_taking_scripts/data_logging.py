@@ -20,15 +20,11 @@ class DataLogger:
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
 
         self.cmd_interface.get('na_s21_iq_data')
-	    #  autoscale the window so that the s21 data fits. This is so I can watch the data while it's being recorded.
-        self.cmd_interface.set('na_commands', 'autoscale')
 	    #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
 
         self.cmd_interface.get('na_s11_iq_data')
-        #  autoscale the window so that the s11 data fits. This is so I can watch the data while it's being recorded.
-        self.cmd_interface.set('na_commands', 'autoscale')
         #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')

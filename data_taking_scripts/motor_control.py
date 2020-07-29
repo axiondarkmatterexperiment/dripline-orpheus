@@ -11,8 +11,8 @@ def inch_to_cm(dist):
 # names should be exactly like 'curved_mirror', 'top_dielectric_plate', 'bottom_dielectric_plate'
 motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
 
-cavity_length_tracker = cm_to_inch(float(input('Enter initial resonator length (in cm): ')))
-distance_to_move = float(input('Enter the distance to move in cm (Empty cavity modemap is usually 3): '))
+initial_mirror_holder_spacing = cm_to_inch(float(input('Enter initial mirror holder spacing (in cm): ')))
+distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
@@ -28,7 +28,8 @@ logger = DataLogger(auths_file)
 logger.initialize_na_settings_for_modemap(averages = 64)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
-initial_plate_separation = orpheus_motors.plate_separation(cavity_length_tracker,num_plates)
+mirror_spacing_tracker = initial_mirror_holder_spacing
+initial_plate_separation = orpheus_motors.plate_separation(mirror_spacing_tracker,num_plates)
 
 #Send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
@@ -38,9 +39,9 @@ try:
     i = 0
     while i <= abs(distance_to_move):
         logger.log_modemap(sec_wait_for_na_averaging) #parameter - time allowed for averaging
-        cavity_length_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
+        mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
-                                                                                   cavity_length_tracker,
+                                                                                   mirror_spacing_tracker,
                                                                                    num_plates,
                                                                                    initial_plate_separation)
         orpheus_motors.wait_for_motors()
