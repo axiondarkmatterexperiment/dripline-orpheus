@@ -9,7 +9,8 @@ def inch_to_cm(dist):
     return dist*2.54
 
 # names should be exactly like 'curved_mirror', 'top_dielectric_plate', 'bottom_dielectric_plate'
-motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+#motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+motors_to_move = ['curved_mirror']
 
 initial_mirror_holder_spacing = cm_to_inch(float(input('Enter initial mirror holder spacing (in cm): ')))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
@@ -17,7 +18,7 @@ resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
 #time to wait
-sec_wait_for_na_averaging = 4
+sec_wait_for_na_averaging = 2
 #important parameters. all units are in inches
 plate_thickness = 1/8
 num_plates = 4
@@ -25,7 +26,7 @@ num_plates = 4
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
 
-logger.initialize_na_settings_for_modemap(averages = 64)
+logger.initialize_na_settings_for_modemap(averages = 16)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 mirror_spacing_tracker = initial_mirror_holder_spacing
@@ -35,7 +36,7 @@ initial_plate_separation = orpheus_motors.plate_separation(mirror_spacing_tracke
 print('Starting modemap measurement')
 logger.start_modemap()
 
-current_resonator_len = inch_to_cm(initial_mirror_holder_spacing)+1.0497
+current_resonator_length = inch_to_cm(initial_mirror_holder_spacing)+1.0497
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
 narrow_scan_span = 200e6
@@ -47,7 +48,7 @@ try:
         logger.log_modemap(sec_wait_for_na_averaging) #parameter - time allowed for averaging
         #log narrowscan
         logger.set_start_freq(resonant_freq-narrow_scan_span/2)
-        logger.set_stop_freq(resonant_freq-narror_scan_span/2)
+        logger.set_stop_freq(resonant_freq-narrow_scan_span/2)
         logger.log_modemap(sec_wait_for_na_averaging)
         #change setting back to widescan
         logger.set_start_freq(wide_scan_start_freq)
@@ -59,7 +60,7 @@ try:
                                                                                    initial_plate_separation)
         orpheus_motors.wait_for_motors()
         i = round((i+inch_to_cm(increment_distance)),4)
-        current_resonator_len = current_resonator_len+i
+        current_resonator_length = current_resonator_length+i
         initial_plate_separation = new_plate_separation
         print("now scanning distance = " +str(i))
 
