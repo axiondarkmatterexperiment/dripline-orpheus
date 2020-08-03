@@ -6,6 +6,10 @@ class DataLogger:
     def __init__(self, auths_file):
         self.auths_file = auths_file
         self.cmd_interface = Interface(dripline_config={'auth-file': self.auths_file})
+        self.list_of_na_entities = ['na_start_freq', 'na_stop_freq',
+                                     'na_power', 'na_averages','na_average_enable']
+        self.list_of_motor_entities = ['curved_mirror_steps', 'bottom_dielectric_plate_steps',
+                                       'top_dielectric_plate_steps']
 
     def set_start_freq(self,start_freq):
         self.cmd_interface.set('na_start_freq', start_freq)
@@ -19,6 +23,26 @@ class DataLogger:
         self.cmd_interface.set('na_power', power)
         self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
+
+    def log_motor_steps(self):
+        for entitiy in self.list_of_motor_entities:
+            self.cmd_interface.cmd(entitiy, 'scheduled_log')
+
+    def log_s21s11(self,start_freq, stop_freq, sec_wait_for_na_averaging):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
+        self.cmd_interface.set('na_measurement_status', 'start_measurement')
+        for entity in self.list_of_na_entities:
+            self.cmd_interface(entity,'scheduled_log')
+        self.cmd_interface.get('na_s21_iq_data')
+	    #  wait for network analyzer to finish several sweeps for averaging
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
+
+        self.cmd_interface.get('na_s11_iq_data')
+        #  wait for network analyzer to finish several sweeps for averaging
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
 
     def log_modemap(self, sec_wait_for_na_averaging):
         print('Setting na_measurement_status to start_measurement')
