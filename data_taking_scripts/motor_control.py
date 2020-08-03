@@ -9,8 +9,8 @@ def inch_to_cm(dist):
     return dist*2.54
 
 # names should be exactly like 'curved_mirror', 'top_dielectric_plate', 'bottom_dielectric_plate'
-#motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
-motors_to_move = ['curved_mirror']
+motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+#motors_to_move = ['curved_mirror']
 
 initial_mirror_holder_spacing = cm_to_inch(float(input('Enter initial mirror holder spacing (in cm): ')))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
@@ -43,12 +43,14 @@ narrow_scan_span = 200e6
 try:
     i = 0
     while i <= abs(distance_to_move):
+        print(current_resonator_length)
         resonant_freq = logger.flmn(0,0,18,current_resonator_length)
+        print(resonant_freq)
         #log widescan
         logger.log_modemap(sec_wait_for_na_averaging) #parameter - time allowed for averaging
         #log narrowscan
         logger.set_start_freq(resonant_freq-narrow_scan_span/2)
-        logger.set_stop_freq(resonant_freq-narrow_scan_span/2)
+        logger.set_stop_freq(resonant_freq+narrow_scan_span/2)
         logger.log_modemap(sec_wait_for_na_averaging)
         #change setting back to widescan
         logger.set_start_freq(wide_scan_start_freq)
@@ -60,7 +62,7 @@ try:
                                                                                    initial_plate_separation)
         orpheus_motors.wait_for_motors()
         i = round((i+inch_to_cm(increment_distance)),4)
-        current_resonator_length = current_resonator_length+i
+        current_resonator_length = current_resonator_length+inch_to_cm(increment_distance)
         initial_plate_separation = new_plate_separation
         print("now scanning distance = " +str(i))
 
@@ -68,3 +70,4 @@ except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
     logger.stop_modemap()
+logger.stop_modemap()
