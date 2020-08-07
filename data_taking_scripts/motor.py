@@ -136,14 +136,18 @@ class OrpheusMotors:
             bdp_ind = self.motor_names.index('bottom_dielectric_plate')
             diff = initial_plate_separation +increment_distance
             move_bottom_plate = diff - new_plate_separation
-            bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,dielectric_plate_thickness)
+            bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,
+                                                               dielectric_plate_thickness,
+                                                               'bottom_dielectric_plate')
             print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
             self.motors[bdp_ind].move_steps(bottom_plate_steps)
 
         if 'top_dielectric_plate' in self.motor_names:
             tdp_ind = self.motor_names.index('top_dielectric_plate')
             move_top_plate = new_plate_separation - initial_plate_separation
-            top_plate_steps = self.plates_distance_to_steps(move_top_plate,dielectric_plate_thickness)
+            top_plate_steps = self.plates_distance_to_steps(move_top_plate,
+                                                            dielectric_plate_thickness,
+                                                            'top_dielectric_plate')
             print(F'Moving top plate motor by {top_plate_steps} steps')
             self.motors[tdp_ind].move_steps(top_plate_steps)
 
@@ -157,7 +161,7 @@ class OrpheusMotors:
         ''' Returns the new plate separation between the dielectrics. '''
         return length/(num_plates+1)
 
-    def plates_distance_to_steps(self,distance,plate_thickness,holder_thickness = (1/4),
+    def plates_distance_to_steps(self,distance,plate_thickness, plate_name,holder_thickness = (1/4),
                                  lip_thickness = (1/20),pitch=(1/20),
                                  steps_per_rotation = 20000):
         ''' Returns the number of steps to move the alumina holders
@@ -166,8 +170,11 @@ class OrpheusMotors:
             Input distance in inches. '''
         holder_center = holder_thickness/2
         plate_center = lip_thickness + plate_thickness/2
-        gap = plate_center-holder_center
-        actual_distance = distance + gap
+        gap = abs(plate_center-holder_center)
+        if plate_name == 'bottom_dielectric_plate':
+            actual_distance = distance - gap
+        else:
+            actual_distance = distance + gap
         num_pitch_lengths = actual_distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
