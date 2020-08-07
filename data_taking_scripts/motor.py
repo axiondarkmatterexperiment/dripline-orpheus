@@ -134,8 +134,9 @@ class OrpheusMotors:
 
         if 'bottom_dielectric_plate' in self.motor_names:
             bdp_ind = self.motor_names.index('bottom_dielectric_plate')
-            diff = initial_plate_separation +increment_distance
-            move_bottom_plate = diff - new_plate_separation
+            #diff = initial_plate_separation +increment_distance
+            #move_bottom_plate = diff - new_plate_separation
+            move_bottom_plate = new_plate_separation - initial_plate_separation
             bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,
                                                                dielectric_plate_thickness,
                                                                'bottom_dielectric_plate')
