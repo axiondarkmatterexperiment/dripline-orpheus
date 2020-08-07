@@ -44,7 +44,9 @@ class DataLogger:
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
 
-    def log_modemap(self, sec_wait_for_na_averaging):
+    def log_modemap(self,start_freq, stop_freq, sec_wait_for_na_averaging):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         print('Logging list of endpoints')
