@@ -166,7 +166,7 @@ class OrpheusMotors:
             Input distance in inches. '''
         holder_center = holder_thickness/2
         plate_center = lip_thickness + plate_thickness/2
-        gap = holder_center - plate_center
+        gap = plate_center-holder_center
         actual_distance = distance + gap
         num_pitch_lengths = actual_distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
