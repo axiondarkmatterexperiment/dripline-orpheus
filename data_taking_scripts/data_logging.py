@@ -71,7 +71,7 @@ class DataLogger:
         self.cmd_interface.set('modemap_measurement_status', 'start_measurement')
         # TODO write if statement
         if not modemap_notes == None:
-            self.cmd_interface.set('modemap_measurement_status_explanation', notes)
+            self.cmd_interface.set('modemap_measurement_status_explanation', modemap_notes)
 
     def stop_modemap(self):
         self.cmd_interface.set('modemap_measurement_status', 'stop_measurement')
