@@ -172,9 +172,9 @@ class OrpheusMotors:
         plate_center = lip_thickness + plate_thickness/2
         gap = abs(plate_center-holder_center)
         if plate_name == 'bottom_dielectric_plate':
-            actual_distance = distance + gap
+            actual_distance = distance
         else:
-            actual_distance = distance + gap
+            actual_distance = distance 
         num_pitch_lengths = actual_distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))

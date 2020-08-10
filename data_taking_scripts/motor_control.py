@@ -44,14 +44,14 @@ try:
     i = 0
     while i <= abs(distance_to_move):
         print(current_resonator_length)
-        resonant_freq = logger.flmn(0,0,18,current_resonator_length)
-        narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
-        narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
-        print(resonant_freq)
+        #resonant_freq = logger.flmn(0,0,18,current_resonator_length)
+        #narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
+        #narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
+        #print(resonant_freq)
         #log widescan
         logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging)
         #log narrowscan
-        logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging)
+        #logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging)
 
         mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                    plate_thickness,
