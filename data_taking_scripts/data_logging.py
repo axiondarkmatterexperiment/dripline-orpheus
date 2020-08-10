@@ -49,7 +49,7 @@ class DataLogger:
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
-	if not na_iq_data_notes == None:
+        if not na_iq_data_notes == None:
             self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         print('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
@@ -70,7 +70,7 @@ class DataLogger:
         # TODO throw error if notes isn't a string.
         self.cmd_interface.set('modemap_measurement_status', 'start_measurement')
         # TODO write if statement
-	if not modemap_notes == None:
+        if not modemap_notes == None:
             self.cmd_interface.set('modemap_measurement_status_explanation', notes)
 
     def stop_modemap(self):
