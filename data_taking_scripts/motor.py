@@ -168,14 +168,7 @@ class OrpheusMotors:
             based on the distance the plates need to move. Takes plate_thickness
             and the distance as input and returns an integer as output.
             Input distance in inches. '''
-        holder_center = holder_thickness/2
-        plate_center = lip_thickness + plate_thickness/2
-        gap = abs(plate_center-holder_center)
-        if plate_name == 'bottom_dielectric_plate':
-            actual_distance = distance + gap
-        else:
-            actual_distance = distance + gap
-        num_pitch_lengths = actual_distance/pitch #these many complete rotations
+        num_pitch_lengths = distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
 
