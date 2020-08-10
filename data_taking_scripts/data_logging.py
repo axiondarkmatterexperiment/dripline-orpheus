@@ -1,10 +1,21 @@
 from dripline.core import Interface
 import time
+import math
 class DataLogger:
 
     def __init__(self, auths_file):
         self.auths_file = auths_file
         self.cmd_interface = Interface(dripline_config={'auth-file': self.auths_file})
+        self.list_of_na_entities = ['na_start_freq', 'na_stop_freq',
+                                     'na_power', 'na_averages','na_average_enable']
+        self.list_of_motor_entities = ['curved_mirror_steps', 'bottom_dielectric_plate_steps',
+                                       'top_dielectric_plate_steps']
+
+    def set_start_freq(self,start_freq):
+        self.cmd_interface.set('na_start_freq', start_freq)
+
+    def set_stop_freq(self,stop_freq):
+        self.cmd_interface.set('na_stop_freq', stop_freq)
 
     def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, sweep_points = 10001):
         self.cmd_interface.set('na_start_freq', start_freq)
@@ -13,7 +24,29 @@ class DataLogger:
         self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
 
-    def log_modemap(self, sec_wait_for_na_averaging):
+    def log_motor_steps(self):
+        for entitiy in self.list_of_motor_entities:
+            self.cmd_interface.cmd(entitiy, 'scheduled_log')
+
+    def log_s21s11(self,start_freq, stop_freq, sec_wait_for_na_averaging):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
+        self.cmd_interface.set('na_measurement_status', 'start_measurement')
+        for entity in self.list_of_na_entities:
+            self.cmd_interface(entity,'scheduled_log')
+        self.cmd_interface.get('na_s21_iq_data')
+	    #  wait for network analyzer to finish several sweeps for averaging
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
+
+        self.cmd_interface.get('na_s11_iq_data')
+        #  wait for network analyzer to finish several sweeps for averaging
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
+
+    def log_modemap(self,start_freq, stop_freq, sec_wait_for_na_averaging):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         print('Logging list of endpoints')
@@ -46,3 +79,19 @@ class DataLogger:
         self.cmd_interface.get('na_s11_iq_data')
         time.sleep(sleep_time)
         self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
+
+    def flmn(self,l, m, n, length,eps_r = 1, r0 = 33):
+        ''' Calculates the resonant frequency for TEM 00n mode.
+            Input units should be in cm. '''
+        c = 299792458.0
+        pi = math.pi
+        v = c/math.sqrt(eps_r)
+        sum = 1+l+m
+        l_in_m = length/100
+        r0_m = r0/100
+
+        arccos_term = math.acos(1-2*l_in_m/r0_m)
+        n_term = ((n+1)*v/2)/l_in_m
+        lm_term = sum*v/(4*l_in_m*pi)
+        resonant_frequency = n_term + lm_term*arccos_term
+        return resonant_frequency
