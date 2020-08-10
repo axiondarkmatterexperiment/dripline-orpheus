@@ -5,4 +5,5 @@ COPY . /usr/local/src/dripline-python-plugin
 WORKDIR /usr/local/src/dripline-python-plugin
 RUN pip install .
 
-WORKDIR /
+
+WORKDIR /usr/local/src/dripline-python-plugin/data_taking_scripts/
