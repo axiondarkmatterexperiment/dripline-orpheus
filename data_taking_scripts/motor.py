@@ -115,8 +115,8 @@ class OrpheusMotors:
         for motor in self.motors:
             motor.move_to_zero()
 
-    def move_by_increment(self, increment_distance, dielectric_plate_thickness,
-                          cavity_length_tracker, num_plates, initial_plate_separation):
+    def move_by_increment(self, increment_distance,cavity_length_tracker,
+                          num_plates, initial_plate_separation):
         ''' Moves initialized motors in a coordinated manner.
             Keeps the dielectric plates even spaced.
             Returns the new resonator length and the new separation
@@ -136,18 +136,14 @@ class OrpheusMotors:
             bdp_ind = self.motor_names.index('bottom_dielectric_plate')
             diff = initial_plate_separation +increment_distance
             move_bottom_plate = diff - new_plate_separation
-            bottom_plate_steps = self.plates_distance_to_steps(move_bottom_plate,
-                                                               dielectric_plate_thickness,
-                                                               'bottom_dielectric_plate')
+            bottom_plate_steps = self.distance_to_steps(move_bottom_plate)
             print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
             self.motors[bdp_ind].move_steps(bottom_plate_steps)
 
         if 'top_dielectric_plate' in self.motor_names:
             tdp_ind = self.motor_names.index('top_dielectric_plate')
             move_top_plate = new_plate_separation - initial_plate_separation
-            top_plate_steps = self.plates_distance_to_steps(move_top_plate,
-                                                            dielectric_plate_thickness,
-                                                            'top_dielectric_plate')
+            top_plate_steps = self.distance_to_steps(move_top_plate)
             print(F'Moving top plate motor by {top_plate_steps} steps')
             self.motors[tdp_ind].move_steps(top_plate_steps)
 
@@ -161,21 +157,9 @@ class OrpheusMotors:
         ''' Returns the new plate separation between the dielectrics. '''
         return length/(num_plates+1)
 
-    def plates_distance_to_steps(self,distance,plate_thickness, plate_name,holder_thickness = (1/4),
-                                 lip_thickness = (1/20),pitch=(1/20),
-                                 steps_per_rotation = 20000):
-        ''' Returns the number of steps to move the alumina holders
-            based on the distance the plates need to move. Takes plate_thickness
-            and the distance as input and returns an integer as output.
-            Input distance in inches. '''
-        num_pitch_lengths = distance/pitch #these many complete rotations
-        steps = steps_per_rotation * num_pitch_lengths
-        return int(round(steps))
-
-    def curved_mirror_distance_to_steps(self,distance, pitch = (1/20), steps_per_rotation = 20000):
-        ''' Returns the number of steps that curved mirror needs to move based on the
-            distance.
-            Input distance in inches. '''
+    def distance_to_steps(self,distance, pitch = (1/20), steps_per_rotation = 20000):
+        ''' Returns the number of steps that a motor needs to
+            turn given a distance.Input distance in inches. '''
         num_pitch_lengths = distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
