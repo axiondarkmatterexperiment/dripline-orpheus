@@ -66,10 +66,10 @@ try:
         print("now scanning distance = " +str(i))
         if override == 0:
             print('')
-            prompt = input("Press 'o' to override this prompt. Press any other key to continue")
+            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
             if prompt == 'o':
                 override = 1
-        
+
 except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
