@@ -23,6 +23,9 @@ class DataLogger:
         self.cmd_interface.set('na_power', power)
         self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
+        #  set up traces.
+        self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
+        self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
 
     def log_motor_steps(self):
         for entitiy in self.list_of_motor_entities:
@@ -34,15 +37,10 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         for entity in self.list_of_na_entities:
             self.cmd_interface(entity,'scheduled_log')
-        self.cmd_interface.get('na_s21_iq_data')
-	    #  wait for network analyzer to finish several sweeps for averaging
+	#  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
-
-        self.cmd_interface.get('na_s11_iq_data')
-        #  wait for network analyzer to finish several sweeps for averaging
-        time.sleep(sec_wait_for_na_averaging)
-        self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
+        self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
 
     def log_modemap(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= None):
         self.set_start_freq(start_freq)
@@ -54,15 +52,10 @@ class DataLogger:
         print('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
 
-        self.cmd_interface.get('na_s21_iq_data')
-	    #  wait for network analyzer to finish several sweeps for averaging
+	#  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
-
-        self.cmd_interface.get('na_s11_iq_data')
-        #  wait for network analyzer to finish several sweeps for averaging
-        time.sleep(sec_wait_for_na_averaging)
-        self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
+        self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
         print('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
