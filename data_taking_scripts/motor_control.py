@@ -42,6 +42,7 @@ wide_scan_stop_freq = 18e9
 narrow_scan_span = 200e6
 try:
     i = 0
+    override = 0 # 0 is false, 1 is true
     while i <= abs(distance_to_move):
         print('Resonator length: {}'.format(current_resonator_length))
         resonant_freq = logger.flmn(0,0,18,current_resonator_length)
@@ -64,6 +65,11 @@ try:
         initial_plate_separation = new_plate_separation
         print("plate separation: {}".format(initial_plate_separation))
         print("now scanning distance = " +str(i))
+        if override == 0:
+            print('')
+            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
+            if prompt == 'o':
+                override = 1
 
 except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
