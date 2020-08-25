@@ -72,6 +72,7 @@ try:
                                                                                    num_plates,
                                                                                    initial_plate_separation)
         orpheus_motors.wait_for_motors()
+        idx = idx+1
         i = round((i+inch_to_cm(increment_distance)),4)
         current_resonator_length = current_resonator_length+inch_to_cm(increment_distance)
         initial_plate_separation = new_plate_separation
