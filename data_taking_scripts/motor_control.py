@@ -17,6 +17,10 @@ distance_to_move = float(input('Enter the distance to move in cm (Empty resonato
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
+resonances_and_lengths = np.loadtxt(filename ... ) ### specify file name
+predicted_lengths = resonances_and_lengths[0,:]
+predicted_resonances = resonances_and_lengths[1,:]
+
 #time to wait
 sec_wait_for_na_averaging = 2
 #important parameters. all units are in inches
@@ -40,14 +44,22 @@ current_resonator_length = inch_to_cm(initial_mirror_holder_spacing)+1.0497
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
 narrow_scan_span = 200e6
+
+final_resonator_length = current_resonator_length+distance_to_move
+lengths_to_be_interpolated = np.linspace(current_resonator_length, final_resonator_length, resolution, endpoint = True)
+resonances_interpd = np.interp(lengths_to_be_interpolated,predicted_lengths, predicted_resonances)
+
 try:
     i = 0
+    idx = 0
     override = 0 # 0 is false, 1 is true
     while i <= abs(distance_to_move):
         print('Resonator length: {}'.format(current_resonator_length))
-        resonant_freq = logger.flmn(0,0,18,current_resonator_length)
-        narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
-        narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
+        #resonant_freq = logger.flmn(0,0,18,current_resonator_length)
+        #narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
+        #narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
+        narrow_scan_start_freq = resonances_interpd[idx]- narrow_scan_span/2
+        narrow_scan_stop_freq = resonances_interpd[idx]+ narrow_scan_span/2
         #print(resonant_freq)
         #log widescan
         logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
