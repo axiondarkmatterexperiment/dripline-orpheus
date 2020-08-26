@@ -128,7 +128,7 @@ class OrpheusMotors:
 
         if 'curved_mirror' in self.motor_names:
             cm_ind = self.motor_names.index('curved_mirror')
-            curved_mirror_steps = self.curved_mirror_distance_to_steps(increment_distance)
+            curved_mirror_steps = self.distance_to_steps(increment_distance)
             print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
             self.motors[cm_ind].move_steps(curved_mirror_steps)
 
