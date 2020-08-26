@@ -18,20 +18,18 @@ wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
 narrow_scan_span = 200e6
 sec_wait_for_na_averaging = 2
+num_plates = 4
 
 initial_mirror_holder_spacing = float(input('Enter initial mirror holder spacing (in cm): '))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
-resonances_and_lengths = np.loadtxt("dielectric_predicted_resonances.txt",skiprows = 1,delimiter = ',')
-predicted_lengths = resonances_and_lengths[:,0]
-predicted_resonances = resonances_and_lengths[:,1]
+if narrow_scan:
+    resonances_and_lengths = np.loadtxt("dielectric_predicted_resonances.txt",skiprows = 1,delimiter = ',')
+    predicted_lengths = resonances_and_lengths[:,0]
+    predicted_resonances = resonances_and_lengths[:,1]
 
-#time to wait
-sec_wait_for_na_averaging = 2
-#important parameters. all units are in inches
-num_plates = 4
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
@@ -62,15 +60,15 @@ try:
                 override = 1
 
         print('Resonator length: {}'.format(current_resonator_length_cm))
-        resonant_freq = logger.flmn(0,0,18,current_resonator_length_cm)
-        if narrow_scan:
+        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
+            resonant_freq = np.interp(current_resonator_length_cm,predicted_lengths, predicted_resonances)
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
         #print(resonant_freq)
         #log widescan
         logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         #log narrowscan
-        if narrow_scan:
+        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         print("now scanning distance = " +str(delta_length))
