@@ -1,0 +1,6 @@
+empty_modemap:
+  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+  initial_mirror_holder_spacing: 15
+  sec_wait_for_na_averaging: 2
+  plate_thickness: 1/8
+  num_plates: 4
