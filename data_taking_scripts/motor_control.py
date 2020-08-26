@@ -12,13 +12,17 @@ def inch_to_cm(dist):
 motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
 #motors_to_move = ['curved_mirror']
 
+narrow_scan = True
+wide_scan_start_freq = 15e9
+wide_scan_stop_freq = 18e9
+narrow_scan_span = 200e6
+sec_wait_for_na_averaging = 2
+
 initial_mirror_holder_spacing = cm_to_inch(float(input('Enter initial mirror holder spacing (in cm): ')))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
-#time to wait
-sec_wait_for_na_averaging = 2
 #important parameters. all units are in inches
 num_plates = 4
 #set up motors and logger
@@ -36,22 +40,21 @@ print('Starting modemap measurement')
 logger.start_modemap('Debugging dielectrics setup')
 
 current_resonator_length = inch_to_cm(initial_mirror_holder_spacing)+1.0497
-wide_scan_start_freq = 15e9
-wide_scan_stop_freq = 18e9
-narrow_scan_span = 200e6
 try:
     i = 0
     override = 0 # 0 is false, 1 is true
     while i <= abs(distance_to_move):
         print('Resonator length: {}'.format(current_resonator_length))
         resonant_freq = logger.flmn(0,0,18,current_resonator_length)
-        narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
-        narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
+        if narrow_scan:
+            narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
+            narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
         #print(resonant_freq)
         #log widescan
         logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         #log narrowscan
-        logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
+        if narrow_scan:
+            logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                         mirror_spacing_tracker,
