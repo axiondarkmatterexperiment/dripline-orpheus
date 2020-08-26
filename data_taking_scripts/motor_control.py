@@ -20,7 +20,6 @@ increment_distance = cm_to_inch(distance_to_move/resolution)
 #time to wait
 sec_wait_for_na_averaging = 2
 #important parameters. all units are in inches
-plate_thickness = 1/8
 num_plates = 4
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
@@ -55,10 +54,9 @@ try:
         logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
-                                                                                   plate_thickness,
-                                                                                   mirror_spacing_tracker,
-                                                                                   num_plates,
-                                                                                   initial_plate_separation)
+                                                                                        mirror_spacing_tracker,
+                                                                                        num_plates,
+                                                                                        initial_plate_separation)
         orpheus_motors.wait_for_motors()
         i = round((i+inch_to_cm(increment_distance)),4)
         current_resonator_length = current_resonator_length+inch_to_cm(increment_distance)
