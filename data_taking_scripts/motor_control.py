@@ -29,13 +29,13 @@ num_plates = 4
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
 
-#  Ask user to describe the measurement. Forces user to document what they are doing. 
+#  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
 logger.initialize_na_settings_for_modemap(averages = 16)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
-mirror_spacing_tracker = initial_mirror_holder_spacing
+mirror_spacing_tracker = initial_mirror_holder_spacing ### CHECK
 current_plate_separation = orpheus_motors.plate_separation(mirror_spacing_tracker,num_plates)
 
 #Send alert saying you are starting the modemap measurement
