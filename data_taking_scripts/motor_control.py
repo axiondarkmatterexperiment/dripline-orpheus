@@ -20,7 +20,6 @@ increment_distance = cm_to_inch(distance_to_move/resolution)
 #time to wait
 sec_wait_for_na_averaging = 2
 #important parameters. all units are in inches
-plate_thickness = 1/8
 num_plates = 4
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
@@ -63,7 +62,6 @@ try:
 
         print("now scanning distance = " +str(delta_length))
         mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
-                                                                                        plate_thickness,
                                                                                         mirror_spacing_tracker,
                                                                                         num_plates,
                                                                                         current_plate_separation)
