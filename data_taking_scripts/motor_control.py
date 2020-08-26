@@ -54,17 +54,18 @@ try:
         #log narrowscan
         logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
-        mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
-                                                                                   plate_thickness,
-                                                                                   mirror_spacing_tracker,
-                                                                                   num_plates,
-                                                                                   initial_plate_separation)
-        orpheus_motors.wait_for_motors()
         i = round((i+inch_to_cm(increment_distance)),4)
-        current_resonator_length = current_resonator_length+inch_to_cm(increment_distance)
-        initial_plate_separation = new_plate_separation
+        if i <= abs(distance_to_move):
+            print("now scanning distance = " +str(i))
+            mirror_spacing_tracker, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
+                                                                                            plate_thickness,
+                                                                                            mirror_spacing_tracker,
+                                                                                            num_plates,
+                                                                                            initial_plate_separation)
+            orpheus_motors.wait_for_motors()
+            current_resonator_length = current_resonator_length+inch_to_cm(increment_distance)
+            initial_plate_separation = new_plate_separation
         print("plate separation: {}".format(initial_plate_separation))
-        print("now scanning distance = " +str(i))
         if override == 0:
             print('')
             prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
