@@ -1,5 +1,6 @@
 from motor import OrpheusMotors
 from data_logging import DataLogger
+import numpy as np
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
@@ -17,9 +18,9 @@ distance_to_move = float(input('Enter the distance to move in cm (Empty resonato
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
-resonances_and_lengths = np.loadtxt(filename ... ) ### specify file name
-predicted_lengths = resonances_and_lengths[0,:]
-predicted_resonances = resonances_and_lengths[1,:]
+resonances_and_lengths = np.loadtxt("dielectric_predicted_resonances.txt",skiprows = 1,delimiter = ',')
+predicted_lengths = resonances_and_lengths[:,0]
+predicted_resonances = resonances_and_lengths[:,1]
 
 #time to wait
 sec_wait_for_na_averaging = 2
