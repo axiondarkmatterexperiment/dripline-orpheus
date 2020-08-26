@@ -29,6 +29,9 @@ num_plates = 4
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
 
+#  Ask user to describe the measurement. Forces user to document what they are doing. 
+measurement_description = input('Describe the current measurement setup: ')
+
 logger.initialize_na_settings_for_modemap(averages = 16)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
@@ -37,7 +40,7 @@ initial_plate_separation = orpheus_motors.plate_separation(mirror_spacing_tracke
 
 #Send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
-logger.start_modemap('Debugging dielectrics setup')
+logger.start_modemap(measurement_description)
 
 current_resonator_length = inch_to_cm(initial_mirror_holder_spacing)+1.0497
 try:
