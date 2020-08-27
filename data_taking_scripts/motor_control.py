@@ -12,8 +12,8 @@ def inch_to_cm(dist):
 motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
 #motors_to_move = ['curved_mirror']
 
-average_enable = True
-average = 16 # value doesn't matter is averable_enable = False
+average_enable = 1 # 1 or 0
+averages = 16 # value doesn't matter is averable_enable = False
 narrow_scan = True
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
@@ -34,7 +34,7 @@ logger = DataLogger(auths_file)
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = 16, average_enable = average_enable)
+logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 

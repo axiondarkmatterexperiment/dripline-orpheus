@@ -18,14 +18,13 @@ class DataLogger:
         self.cmd_interface.set('na_stop_freq', stop_freq)
 
     def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) ,
-                                           averages = 0, average_enable = False, sweep_points = 10001):
+                                           averages = 0, average_enable = 1, sweep_points = 10001):
         self.cmd_interface.set('na_start_freq', start_freq)
         self.cmd_interface.set('na_stop_freq', stop_freq)
         self.cmd_interface.set('na_power', power)
-        if average_enable == True:
+        self.cmd_interface.set('na_average_enable', average_enable)
+        if average_enable == 1:
             self.cmd_interface.set('na_averages', averages)
-        else:
-            self.cmd_interface.set('na_averages', 0)
         self.cmd_interface.set('na_sweep_points', sweep_points)
         #  set up traces.
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
