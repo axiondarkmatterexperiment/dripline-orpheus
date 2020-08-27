@@ -12,6 +12,8 @@ def inch_to_cm(dist):
 motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
 #motors_to_move = ['curved_mirror']
 
+average_enable = True
+average = 16 # value doesn't matter is averable_enable = False
 narrow_scan = True
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
