@@ -51,7 +51,7 @@ current_plate_separation = orpheus_motors.plate_separation(current_resonator_len
 try:
     delta_length = 0
     override = 0 # 0 is false, 1 is true
-    while delta_length <= abs(distance_to_move):
+    while delta_length < abs(distance_to_move):
         delta_length = round((delta_length+inch_to_cm(increment_distance)),4)
         if override == 0:
             print('')
