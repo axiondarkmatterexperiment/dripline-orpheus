@@ -68,10 +68,10 @@ try:
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
         #print(resonant_freq)
         #log widescan
-        logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
+        logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan', autoscale=True)
         #log narrowscan
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
+            logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', autoscale=True)
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
