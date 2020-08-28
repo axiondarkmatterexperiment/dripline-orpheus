@@ -45,7 +45,7 @@ class DataLogger:
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
         self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
 
-    def log_modemap(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= None):
+    def log_vna_data(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= None):
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
@@ -54,7 +54,6 @@ class DataLogger:
             self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         print('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
-
 	#  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
