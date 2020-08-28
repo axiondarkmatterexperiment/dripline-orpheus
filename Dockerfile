@@ -4,8 +4,10 @@ COPY . /usr/local/src/dripline-python-plugin
 
 WORKDIR /usr/local/src/dripline-python-plugin
 RUN pip install .
-
-RUN apt-get -y update
-RUN apt-get -y install vim python-numpy
+RUN pip3 install numpy
+RUN pip3 install scipy
 
 WORKDIR /usr/local/src/dripline-python-plugin/data_taking_scripts/
+
+RUN apt-get -y update
+RUN apt-get -y install vim 
