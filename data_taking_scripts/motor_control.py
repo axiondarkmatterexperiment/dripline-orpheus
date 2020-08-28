@@ -1,5 +1,7 @@
 from motor import OrpheusMotors
 from data_logging import DataLogger
+import numpy as np
+from scipy import interpolate
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
@@ -17,16 +19,21 @@ averages = 16 # value doesn't matter is averable_enable = False
 narrow_scan = True
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
-narrow_scan_span = 200e6
+narrow_scan_span = 400e6
 sec_wait_for_na_averaging = 2
+num_plates = 4
 
 initial_mirror_holder_spacing = float(input('Enter initial mirror holder spacing (in cm): '))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
 resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
-#important parameters. all units are in inches
-num_plates = 4
+if narrow_scan:
+    resonances_and_lengths = np.loadtxt("dielectric_measured_resonances2.txt", skiprows = 1,delimiter = ',')
+    predicted_lengths = resonances_and_lengths[:,0]
+    predicted_resonances = resonances_and_lengths[:,1]
+    func_res_freq_interp = interpolate.interp1d(predicted_lengths, predicted_resonances, kind='cubic')
+
 #set up motors and logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
@@ -34,7 +41,7 @@ logger = DataLogger(auths_file)
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable)
+logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = 1000)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
@@ -45,20 +52,20 @@ logger.start_modemap(measurement_description)
 current_resonator_length_cm = initial_mirror_holder_spacing+1.0497
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
+
 try:
     delta_length = 0
-    override = 0 # 0 is false, 1 is true
+    override = 0
     while delta_length < abs(distance_to_move):
         delta_length = round((delta_length+inch_to_cm(increment_distance)),4)
         if override == 0:
-            print('')
             prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
+            print('')
             if prompt == 'o':
                 override = 1
-
         print('Resonator length: {}'.format(current_resonator_length_cm))
-        resonant_freq = logger.flmn(0,0,18,current_resonator_length_cm)
-        if narrow_scan:
+        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
+            resonant_freq = func_res_freq_interp(current_resonator_length_cm)
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
         #print(resonant_freq)
