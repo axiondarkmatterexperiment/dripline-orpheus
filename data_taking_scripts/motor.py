@@ -38,6 +38,10 @@ class Motor:
         command = F"{self.name}_move_steps"
         self.cmd_interface.set(command,steps)
 
+    def set_internal_position_to_value(self, value):
+        command = F"{self.name}_set_internal_position"
+        self.cmd_interface.set(command, value)
+
     def stop_and_kill(self):
         ''' Tells motors to stop ASAP. '''
         command = F"{self.name}_status_command"
@@ -163,3 +167,7 @@ class OrpheusMotors:
         num_pitch_lengths = distance/pitch #these many complete rotations
         steps = steps_per_rotation * num_pitch_lengths
         return int(round(steps))
+
+    def set_internal_position_to_value(self, value):
+        for motor in self.motors:
+            motor.set_internal_position_to_value(value)

@@ -14,6 +14,8 @@ def inch_to_cm(dist):
 motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
 #motors_to_move = ['curved_mirror']
 
+average_enable = 1 # 1 or 0
+averages = 16 # value doesn't matter is averable_enable = False
 narrow_scan = True
 wide_scan_start_freq = 15e9
 wide_scan_stop_freq = 18e9
@@ -39,7 +41,7 @@ logger = DataLogger(auths_file)
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = 16, sweep_points=1000)
+logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = 1000)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
@@ -68,10 +70,10 @@ try:
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
         #print(resonant_freq)
         #log widescan
-        logger.log_modemap(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan', autoscale=True)
+        logger.log_vna_data(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         #log narrowscan
-        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            logger.log_modemap(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', autoscale=True)
+        if narrow_scan:
+            logger.log_vna_data(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
