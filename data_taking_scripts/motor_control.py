@@ -2,6 +2,19 @@ from motor import OrpheusMotors
 from data_logging import DataLogger
 import numpy as np
 from scipy import interpolate
+import yaml
+
+config_file = open("config.yaml")
+configs = yaml.load(config_file, Loader =yaml.FullLoader)
+general_mechanical_configs = configs['general_configs']
+list_of_keys = list(configs["measurement_configs"].keys())
+locals().update(general_mechanical_configs)
+print("  Configurations  ")
+for i in range(len(list_of_keys)):
+    print(F"{i}  {list_of_keys[i]}")
+picked_config = int(input(F"Pick you configuration (0 - {len(list_of_keys)-1}): "))
+locals().update(configs['measurement_configs'][list_of_keys[picked_config]])
+
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
@@ -9,19 +22,6 @@ def cm_to_inch(dist):
     return dist/2.54
 def inch_to_cm(dist):
     return dist*2.54
-
-# names should be exactly like 'curved_mirror', 'top_dielectric_plate', 'bottom_dielectric_plate'
-motors_to_move = ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
-#motors_to_move = ['curved_mirror']
-
-average_enable = 1 # 1 or 0
-averages = 16 # value doesn't matter is averable_enable = False
-narrow_scan = True
-wide_scan_start_freq = 15e9
-wide_scan_stop_freq = 18e9
-narrow_scan_span = 400e6
-sec_wait_for_na_averaging = 2
-num_plates = 4
 
 initial_mirror_holder_spacing = float(input('Enter initial mirror holder spacing (in cm): '))
 distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
