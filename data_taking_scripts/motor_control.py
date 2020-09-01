@@ -28,7 +28,7 @@ resolution = int(input('Enter the number of measurements needed: '))
 increment_distance = cm_to_inch(distance_to_move/resolution)
 
 if narrow_scan:
-    resonances_and_lengths = np.loadtxt("dielectric_measured_resonances2.txt", skiprows = 1,delimiter = ',')
+    resonances_and_lengths = np.loadtxt(ifile_predicted_resonances, skiprows = 1,delimiter = ',')
     predicted_lengths = resonances_and_lengths[:,0]
     predicted_resonances = resonances_and_lengths[:,1]
     func_res_freq_interp = interpolate.interp1d(predicted_lengths, predicted_resonances, kind='cubic')
