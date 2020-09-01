@@ -64,15 +64,13 @@ try:
             if prompt == 'o':
                 override = 1
         print('Resonator length: {}'.format(current_resonator_length_cm))
+        #log widescan
+        logger.log_vna_data(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             resonant_freq = func_res_freq_interp(current_resonator_length_cm)
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
-        #print(resonant_freq)
-        #log widescan
-        logger.log_vna_data(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
-        #log narrowscan
-        if narrow_scan:
+            #log narrowscan
             logger.log_vna_data(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         print("now scanning distance = " +str(delta_length))
