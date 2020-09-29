@@ -10,10 +10,11 @@ measurement_configs:
     initial_mirror_holder_spacing: 15 #length in cm
     sec_wait_for_na_averaging: 2 #time in seconds
     average_enable: 1 # 1 or 0
+    sweept_ponts: 1000
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
-    narrow_scan_span: 400000000
     ifile_predicted_resonances: empty_analytical_resonances.txt
+    narrow_scan_span: 400000000
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 11.95 #length in cm
@@ -23,6 +24,7 @@ measurement_configs:
     narrow_scan: True
     narrow_scan_span: 400000000
     ifile_predicted_resonances: dielectric_predicted_resonances.txt
+    sweept_ponts: 1000
 
   ln2_empty_modemap:
     initial_mirror_holder_spacing: 00 #length in cm
@@ -31,6 +33,8 @@ measurement_configs:
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     narrow_scan_span: 400000000
+    ifile_predicted_resonances: null
+    sweept_ponts: 1000
 
   ln2_dielectric_modemap:
     initial_mirror_holder_spacing: 10 #length in cm
@@ -39,3 +43,5 @@ measurement_configs:
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     narrow_scan_span: 400000000
+    ifile_predicted_resonances: null
+    sweept_ponts: 1000
