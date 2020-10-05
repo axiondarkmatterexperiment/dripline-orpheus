@@ -40,7 +40,7 @@ logger = DataLogger(auths_file)
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = sweep_ponts)
+logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = sweep_points)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
