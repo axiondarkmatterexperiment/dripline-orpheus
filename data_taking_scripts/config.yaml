@@ -17,7 +17,7 @@ measurement_configs:
     narrow_scan_span: 20000000
 
   dielectric_modemap:
-    initial_mirror_holder_spacing: 11.95 #length in cm
+    initial_mirror_holder_spacing: 12.55 #length in cm
     sec_wait_for_na_averaging: 2 #time in seconds
     average_enable: 1 # 1 or 0
     averages: 16 # value doesn't matter is averable_enable = 0
