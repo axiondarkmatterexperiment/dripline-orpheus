@@ -10,11 +10,11 @@ measurement_configs:
     initial_mirror_holder_spacing: 15 #length in cm
     sec_wait_for_na_averaging: 2 #time in seconds
     average_enable: 1 # 1 or 0
-    sweep_points: 1000
+    sweep_points: 2000
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
-    narrow_scan_span: 20000000
+    narrow_scan_span: 70000000
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm
@@ -45,3 +45,4 @@ measurement_configs:
     narrow_scan_span: 400000000
     ifile_predicted_resonances: null
     sweep_points: 1000
+
