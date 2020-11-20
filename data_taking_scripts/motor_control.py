@@ -48,7 +48,7 @@ orpheus_motors.wait_for_motors()
 print('Starting modemap measurement')
 logger.start_modemap(measurement_description)
 
-current_resonator_length_cm = initial_mirror_holder_spacing+1.0497
+current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
