@@ -11,7 +11,7 @@ initial_mirror_holder_spacing = float(input('Enter initial mirror holder spacing
 distance_to_move = float(input('Enter the distance to move in cm: '))
 
 num_plates = 4
-current_resonator_length_cm =  initial_mirror_holder_spacing + 1.0497
+current_resonator_length_cm =  initial_mirror_holder_spacing + 1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = current_resonator_length_in/(num_plates+1)
 
