@@ -6,7 +6,7 @@ import time
 
 __all__ = []
 
-__all__.append("EntitiesSnapshotter")
+__all__.append("MuxerService")
 class MuxerService(SimpleSCPIEntity):
     '''
     Provider to interface with muxer
@@ -18,7 +18,7 @@ class MuxerService(SimpleSCPIEntity):
         '''
         SimpleSCPIEntity.__init__(self,**kwargs)
         if scan_interval <= 0:
-            pass
+            raise ThrowReply("scan interval must be > 0")
             #raise exceptions.DriplineValueError("scan interval must be > 0")
         self.scan_interval = scan_interval
 
@@ -38,7 +38,8 @@ class MuxerService(SimpleSCPIEntity):
                                         'SYST:ERR?'])
                 if error_data != '1;+0,"No error"':
                     logger.critical('Error detected; cannot configure muxer')
-                    raise exceptions.DriplineHardwareError('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
+                    raise ThrowReply('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
+                    #raise exceptions.DriplineHardwareError('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
 
             ch_scan_list.append(str(self.endpoints[child].ch_number))
             self.endpoints[child].log_interval = self.scan_interval
@@ -65,7 +66,7 @@ class MuxerGetEntity(Entity):
         conf_str (str): used by MuxerProvider to configure endpoint scan
         '''
         if conf_str is None:
-            pass
+            raise ThrowReply('conf_str required for MuxerGetSpime endpoint {}, set to False to not configure'.format(self.name))
             #raise DriplineValueError('conf_str required for MuxerGetSpime endpoint {}, set to False to not configure'.format(self.name))
         self.get_str = "DATA:LAST? (@{})".format(ch_number)
         self.ch_number = ch_number
@@ -79,7 +80,7 @@ class MuxerGetEntity(Entity):
         return result.split()[0]
 
     def on_set(self, value):
-        pass
+        raise ThrowReply('setting not available for {}'.format(self.name))
         #raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
