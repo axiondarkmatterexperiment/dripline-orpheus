@@ -1,5 +1,4 @@
 import math
-from dripline.core import calibrate
 import logging
 logger = logging.getLogger(__name__)
 
