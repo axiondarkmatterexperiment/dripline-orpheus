@@ -3,6 +3,7 @@ from dripline.implementations import SimpleSCPIEntity
 import logging
 logger = logging.getLogger(__name__)
 import time
+from muxer_calibrations import pt100_cal
 
 __all__ = []
 
