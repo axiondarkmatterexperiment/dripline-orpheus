@@ -33,7 +33,7 @@ class MuxerService(SimpleSCPIEntity):
         ch_scan_list = list()
         for child in self.endpoints:
 
-            if not isinstance(self.endpoints[child], MuxerGetSpime):
+            if not isinstance(self.endpoints[child], MuxerGetEntity):
                 continue
             elif self.endpoints[child].conf_str:
                 error_data = self.send([self.endpoints[child].conf_str+';*OPC?',\
@@ -56,7 +56,7 @@ class MuxerService(SimpleSCPIEntity):
 __all__.append("MuxerGetEntity")
 class MuxerGetEntity(Entity):
     '''
-    Spime for communication with muxer endpoints.  No set functionality.
+    Entity for communication with muxer endpoints.  No set functionality.
     '''
 
     #TODO define conditional logging.
@@ -69,11 +69,11 @@ class MuxerGetEntity(Entity):
         conf_str (str): used by MuxerProvider to configure endpoint scan
         '''
         if conf_str is None:
-            raise ThrowReply('conf_str required for MuxerGetSpime endpoint {}, set to False to not configure'.format(self.name))
+            raise ThrowReply('conf_str required for MuxerGetEntity endpoint {}, set to False to not configure'.format(self.name))
         self.get_str = "DATA:LAST? (@{})".format(ch_number)
         self.ch_number = ch_number
         self.conf_str = conf_str.format(ch_number)
-        Spime.__init__(self, **kwargs)
+        Entity.__init__(self, **kwargs)
 
     @calibrate([pt100_cal])
     def on_get(self):
