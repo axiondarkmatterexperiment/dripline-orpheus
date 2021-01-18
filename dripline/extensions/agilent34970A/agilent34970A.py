@@ -10,6 +10,7 @@ __all__.append("MuxerService")
 class MuxerService(SimpleSCPIEntity):
     '''
     Provider to interface with muxer
+    Not in use right now because I don't have an equivalent of a prologix_provider.py and repeater_provider.py. I think for now, I can get by with just at Get MuxerEntity.
     '''
 
     def __init__(self, scan_interval=0,**kwargs):
@@ -57,6 +58,7 @@ class MuxerGetEntity(Entity):
     Spime for communication with muxer endpoints.  No set functionality.
     '''
 
+    #TODO define conditional logging.
     def __init__(self,
                  ch_number,
                  conf_str=None,
@@ -67,7 +69,6 @@ class MuxerGetEntity(Entity):
         '''
         if conf_str is None:
             raise ThrowReply('conf_str required for MuxerGetSpime endpoint {}, set to False to not configure'.format(self.name))
-            #raise DriplineValueError('conf_str required for MuxerGetSpime endpoint {}, set to False to not configure'.format(self.name))
         self.get_str = "DATA:LAST? (@{})".format(ch_number)
         self.ch_number = ch_number
         self.conf_str = conf_str.format(ch_number)
@@ -81,6 +82,5 @@ class MuxerGetEntity(Entity):
 
     def on_set(self, value):
         raise ThrowReply('setting not available for {}'.format(self.name))
-        #raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
