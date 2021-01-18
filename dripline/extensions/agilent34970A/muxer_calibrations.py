@@ -2,6 +2,7 @@ import math
 import logging
 logger = logging.getLogger(__name__)
 
+__all__ = []
 def piecewise_cal(values_x, values_y, this_x, log_x=False, log_y=False):
     if log_x:
         logger.debug("doing log x cal")
