@@ -75,7 +75,7 @@ class MuxerGetEntity(Entity):
         self.conf_str = conf_str.format(ch_number)
         Spime.__init__(self, **kwargs)
 
-    @calibrate([pt100_calibration, cernox_calibration, cernox_calibration_chebychev])
+    @calibrate([pt100_cal])
     def on_get(self):
         result = self.service.send_to_device([self.get_str.format(self.ch_number)])
         logger.debug('very raw is: {}'.format(result))
