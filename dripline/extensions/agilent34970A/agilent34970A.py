@@ -8,7 +8,7 @@ from .muxer_calibrations import pt100_cal
 __all__ = []
 
 __all__.append("MuxerService")
-class MuxerService(SimpleSCPIEntity):
+class MuxerService(EthernetSCPIService):
     '''
     Provider to interface with muxer
     Not in use right now because I don't have an equivalent of a prologix_provider.py and repeater_provider.py. I think for now, I can get by with just at Get MuxerEntity.
@@ -26,7 +26,7 @@ class MuxerService(SimpleSCPIEntity):
 
     def configure_scan(self, *args, **kwargs):
         '''
-        loops over the provider's internal list of endpoints and attempts to configure each, then configures and begins scan
+        loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
         '''
         self.send(['ABOR;*CLS;*OPC?'])
 
