@@ -1,5 +1,5 @@
 from dripline.core import Entity, calibrate, ThrowReply
-from dripline.implementations import SimpleSCPIEntity, EthernetSCPIService
+from dripline.implementations import EthernetSCPIService
 import logging
 logger = logging.getLogger(__name__)
 import time
