@@ -11,7 +11,6 @@ __all__.append("MuxerService")
 class MuxerService(EthernetSCPIService):
     '''
     Provider to interface with muxer
-    Not in use right now because I don't have an equivalent of a prologix_provider.py and repeater_provider.py. I think for now, I can get by with just at Get MuxerEntity.
     '''
 
     def __init__(self, scan_interval=0,**kwargs):
@@ -36,13 +35,12 @@ class MuxerService(EthernetSCPIService):
             if not isinstance(self.endpoints[child], MuxerGetEntity):
                 continue
             elif self.endpoints[child].conf_str:
+                # check if the configuration command associated with the endpoint is valid.
                 error_data = self.send([self.endpoints[child].conf_str+';*OPC?',\
                                         'SYST:ERR?'])
                 if error_data != '1;+0,"No error"':
                     logger.critical('Error detected; cannot configure muxer')
                     raise ThrowReply('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
-                    #raise exceptions.DriplineHardwareError('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
-
             ch_scan_list.append(str(self.endpoints[child].ch_number))
             self.endpoints[child].log_interval = self.scan_interval
 
