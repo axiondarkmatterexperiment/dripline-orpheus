@@ -17,7 +17,7 @@ class MuxerService(EthernetSCPIService):
         '''
         scan_interval (int): time between scans in seconds
         '''
-        SimpleSCPIEntity.__init__(self,**kwargs)
+        EthernetSCPIService.__init__(self,**kwargs)
         if scan_interval <= 0:
             raise ThrowReply("scan interval must be > 0")
             #raise exceptions.DriplineValueError("scan interval must be > 0")
