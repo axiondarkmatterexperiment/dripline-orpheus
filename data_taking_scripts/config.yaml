@@ -1,5 +1,4 @@
 general_configs:
-  plate_thickness: 1/8
   num_plates: 4
   motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
   wide_scan_start_freq: 15000000000
