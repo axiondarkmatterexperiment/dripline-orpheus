@@ -61,6 +61,34 @@ class DataLogger:
         print('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
+    def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
+        print('Setting na_measurement_status to start_measurement')
+        self.cmd_interface.set('na_measurement_status', 'start_measurement')
+        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
+        print('Logging list of endpoints')
+        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        # get transmission data
+        self.cmd_interface.get('s21_iq_transmission_data')
+	    #  wait for network analyzer to finish several sweeps for averaging
+        self.cmd_interface.set('switch_ps_enable_output', 0)
+        time.sleep(sec_wait_for_na_averaging)
+        if autoscale:
+            self.cmd_interface.set('na_commands', 'autoscale')
+        self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
+
+        # get reflection data
+        self.cmd_interface.set('switch_ps_enable_output', 1)
+        self.cmd_interface.get('s21_iq_reflection_data')
+	    #  wait for network analyzer to finish several sweeps for averaging
+        time.sleep(sec_wait_for_na_averaging)
+        if autoscale:
+            self.cmd_interface.set('na_commands', 'autoscale')
+        self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
+        print('Setting na_measurement_status to stop_measurement')
+        self.cmd_interface.set('na_measurement_status', 'stop_measurement')
+
     def start_modemap(self, modemap_notes = ''):
         # TODO throw error if notes isn't a string.
         self.cmd_interface.set('modemap_measurement_status', 'start_measurement')
