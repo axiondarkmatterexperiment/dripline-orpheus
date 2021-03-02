@@ -72,14 +72,14 @@ class DataLogger:
         # get transmission data
         self.cmd_interface.get('s21_iq_transmission_data')
 	    #  wait for network analyzer to finish several sweeps for averaging
-        self.cmd_interface.set('switch_ps_enable_output', 0)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
         time.sleep(sec_wait_for_na_averaging)
         if autoscale:
             self.cmd_interface.set('na_commands', 'autoscale')
         self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
 
         # get reflection data
-        self.cmd_interface.set('switch_ps_enable_output', 1)
+        self.cmd_interface.set('switch_ps_channel_output', 1)
         self.cmd_interface.get('s21_iq_reflection_data')
 	    #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
