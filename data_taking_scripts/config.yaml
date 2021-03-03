@@ -8,6 +8,8 @@ measurement_configs:
   empty_modemap:
     initial_mirror_holder_spacing: 15 #length in cm
     sec_wait_for_na_averaging: 10 #time in seconds
+    sec_wait_for_na_averaging_transmission: 10 #time in seconds
+    sec_wait_for_na_averaging_reflection: 4 #time in seconds
     average_enable: 1 # 1 or 0
     sweep_points: 1000
     averages: 16 # value doesn't matter is averable_enable = 0
