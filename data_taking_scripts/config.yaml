@@ -14,7 +14,7 @@ measurement_configs:
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
     narrow_scan_span: 70000000
-    tem0018_offste: -40000000
+    tem0018_offset: -15000000
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm
