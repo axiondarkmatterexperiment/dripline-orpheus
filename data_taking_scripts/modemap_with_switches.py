@@ -3,6 +3,7 @@ from data_logging import DataLogger
 import numpy as np
 from scipy import interpolate
 import yaml
+from dripline.core import Interface
 
 config_file = open("config.yaml")
 configs = yaml.load(config_file, Loader =yaml.FullLoader)
@@ -17,6 +18,8 @@ locals().update(configs['measurement_configs'][list_of_keys[picked_config]])
 
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
+
+the_interface = Interface(dripline_config={'auth-file': self.auths_file})
 
 def cm_to_inch(dist):
     return dist/2.54
@@ -66,7 +69,7 @@ try:
         #log widescan
         logger.log_transmission_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            resonant_freq = func_res_freq_interp(current_resonator_length_cm)
+            resonant_freq = func_res_freq_interp(current_resonator_length_cm) + tem0018_offset
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
             #log narrowscan
@@ -86,4 +89,6 @@ except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
     logger.stop_modemap()
+
+the_interface.set('switch_ps_channel_output', 0)
 logger.stop_modemap()
