@@ -19,7 +19,7 @@ locals().update(configs['measurement_configs'][list_of_keys[picked_config]])
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
 
-the_interface = Interface(dripline_config={'auth-file': self.auths_file})
+the_interface = Interface(dripline_config={'auth-file': auths_file})
 
 def cm_to_inch(dist):
     return dist/2.54
