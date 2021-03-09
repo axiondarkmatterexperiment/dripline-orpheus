@@ -6,6 +6,7 @@ from fitting_functions import data_lorentzian_fit
 from fitting_functions import calculate_coupling
 from fitting_functions import reflection_deconvolve_line
 from scipy.interpolate import interp1d
+from fitting_functions import func_pow_reflected
 
 class DataLogger:
 
@@ -103,7 +104,7 @@ class DataLogger:
             self.cmd_interface.set('na_commands', 'autoscale')
         self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
         if fitting:
-            s11_iq = test_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
+            s11_iq = selt.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
             s11_re, s11_im = np.array(s11_iq[::2]), np.array(s11_iq[1::2])
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
@@ -112,14 +113,18 @@ class DataLogger:
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
             print('Reflection lorentzian fitted parameters')
             print(popt_reflection)
-            # Gam_res is reflection coeffient Gamma of the resonator
-            Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
-            # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
-            Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
-            Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
-            # calculate phase of Gamma_cavity at resonant frequency by interpolating
-            # data.
-            Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
+            #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
+            if popt_reflection[2] >= popt_reflection[3]:
+                beta = 1
+            else:
+                # Gam_res is reflection coeffient Gamma of the resonator
+                Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
+                # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
+                Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
+                Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
+                # calculate phase of Gamma_cavity at resonant frequency by interpolating
+                # data.
+                Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
             beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
             print("Antenna coupling : {}".format(beta))
         print('Setting na_measurement_status to stop_measurement')
