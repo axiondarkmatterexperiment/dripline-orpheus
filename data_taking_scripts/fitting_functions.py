@@ -11,6 +11,9 @@ def unpack_iq_data(data):
     unpacked_data = [data[i]**2+ data[i+1]**2 for i in range(0,len(data)-1,2)]
     return np.array(unpacked_data)
 
+def estimate_uncertainty(data):
+    return 2*np.sqrt(data)
+
 def find_nearest_ind(array, value):
     '''Takes in an array and finds the index of a specific value'''
     ind = (np.abs(array-value)).argmin()
