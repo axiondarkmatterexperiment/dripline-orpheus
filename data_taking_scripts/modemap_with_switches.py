@@ -73,7 +73,7 @@ try:
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
             #log narrowscan
-            logger.log_transmission_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
+            logger.log_transmission_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
