@@ -2,7 +2,10 @@ from dripline.core import Interface
 import time
 import math
 import numpy as np
-
+from fitting_functions import data_lorentzian_fit
+from fitting_functions import calculate_coupling
+from fitting_functions import reflection_deconvolve_line
+from scipy.interpolate import interp1d
 
 class DataLogger:
 
@@ -85,7 +88,7 @@ class DataLogger:
             s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
-            popt_transmission, pcov_transmission = data_lorentzian_fit(pow_s21, freq_mag_s21, 'transmission')
+            popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
             print('Transmission lorentzian fitted parameters')
             print(popt_transmission)
