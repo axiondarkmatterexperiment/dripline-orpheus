@@ -80,7 +80,7 @@ class DataLogger:
             self.cmd_interface.set('na_commands', 'autoscale')
         self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
         if fitting:
-            s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()('value_cal')
+            s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
             s21_re, s21_im = array(s21_iq[::2]), array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
