@@ -93,6 +93,10 @@ class DataLogger:
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
             print('Transmission lorentzian fitted parameters')
             print(popt_transmission)
+            self.cmd_interface.set('f_transmission', popt_transmission[0])
+            self.cmd_interface.set('Q_transmission', popt_transmission[1])
+            self.cmd_interface.set('dy_transmission', popt_transmission[2])
+            self.cmd_interface.set('C_transmission', popt_transmission[3])
 
 
         # get reflection data
@@ -113,6 +117,11 @@ class DataLogger:
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
             print('Reflection lorentzian fitted parameters')
             print(popt_reflection)
+            self.cmd_interface.set('f_reflection', popt_reflection[0])
+            self.cmd_interface.set('Q_reflection', popt_reflection[1])
+            self.cmd_interface.set('dy_reflection', popt_reflection[2])
+            self.cmd_interface.set('C_reflection', popt_reflection[3])
+
             #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
             if popt_reflection[2] >= popt_reflection[3]:
                 beta = 1
@@ -127,6 +136,7 @@ class DataLogger:
                 Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
             beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
             print("Antenna coupling : {}".format(beta))
+            self.cmd_interface.set('antenna_coupling', beta)
         print('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
