@@ -264,7 +264,7 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         self.cmd_interface.set('switch_ps_channel_output', 0)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
-        self.cmd_interface.set('switch_ps_select_channel', 0)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
 
     def switch_digitization_path(self):
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
