@@ -112,6 +112,7 @@ class DataLogger:
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
+            freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
             popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
             print('Reflection lorentzian fitted parameters')
@@ -253,18 +254,18 @@ class DataLogger:
         resonant_frequency = n_term + lm_term*arccos_term
         return resonant_frequency
 
-    def switch_reflection_path():
+    def switch_reflection_path(self):
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         self.cmd_interface.set('switch_ps_channel_output', 0)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         self.cmd_interface.set('switch_ps_channel_output', 1)
 
-    def switch_transmission_path():
+    def switch_transmission_path(self):
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         self.cmd_interface.set('switch_ps_channel_output', 0)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         self.cmd_interface.set('switch_ps_select_channel', 0)
 
-    def switch_digitization_path():
+    def switch_digitization_path(self):
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         self.cmd_interface.set('switch_ps_channel_output', 1)
