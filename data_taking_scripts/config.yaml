@@ -14,10 +14,10 @@ measurement_configs:
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
-    narrow_scan_span: 70000000
-    tem0018_offset: -25000000
+    narrow_scan_span: 50000000
+    tem0018_offset: -21000000
     fitting: true
-    digitize: false
+    digitize: true
     if_center: 30000000
 
   dielectric_modemap:
