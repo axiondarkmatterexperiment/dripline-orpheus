@@ -108,7 +108,7 @@ class DataLogger:
             self.cmd_interface.set('na_commands', 'autoscale')
         self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
         if fitting:
-            s11_iq = selt.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
+            s11_iq = self.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
             s11_re, s11_im = np.array(s11_iq[::2]), np.array(s11_iq[1::2])
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
