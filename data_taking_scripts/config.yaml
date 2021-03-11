@@ -18,6 +18,8 @@ measurement_configs:
     narrow_scan_span: 70000000
     tem0018_offset: -25000000
     fitting: true
+    digitize: false
+    if_center: 30000000
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm

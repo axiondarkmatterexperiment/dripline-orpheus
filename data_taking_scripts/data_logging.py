@@ -68,7 +68,78 @@ class DataLogger:
         print('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
+        print('Setting na_measurement_status to start_measurement')
+        self.cmd_interface.set('na_measurement_status', 'start_measurement')
+        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
+        print('Logging list of endpoints')
+        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.switch_transmission_path()
+        self.cmd_interface.get('s21_iq_transmission_data')
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
+        if fitting:
+            s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
+            s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
+            s21_pow = s21_re**2 + s21_im**2
+            freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
+            popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
+            perr_transmission = np.sqrt(np.diag(pcov_transmission))
+            print('Transmission lorentzian fitted parameters')
+            print(popt_transmission)
+            self.cmd_interface.set('f_transmission', popt_transmission[0])
+            self.cmd_interface.set('Q_transmission', popt_transmission[1])
+            self.cmd_interface.set('dy_transmission', popt_transmission[2])
+            self.cmd_interface.set('C_transmission', popt_transmission[3])
+
+    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+        self.set_start_freq(start_freq)
+        self.set_stop_freq(stop_freq)
+        print('Setting na_measurement_status to start_measurement')
+        self.cmd_interface.set('na_measurement_status', 'start_measurement')
+        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
+        print('Logging list of endpoints')
+        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.switch_reflection_path()
+        self.cmd_interface.get('s21_iq_reflection_data')
+        time.sleep(sec_wait_for_na_averaging)
+        self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
+        if fitting:
+            s11_iq = self.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
+            s11_re, s11_im = np.array(s11_iq[::2]), np.array(s11_iq[1::2])
+            s11_pow = s11_re**2 + s11_im**2
+            s11_mag = np.sqrt(s11_pow)
+            s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
+            popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
+            perr_reflection = np.sqrt(np.diag(pcov_reflection))
+            print('Reflection lorentzian fitted parameters')
+            print(popt_reflection)
+            self.cmd_interface.set('f_reflection', popt_reflection[0])
+            self.cmd_interface.set('Q_reflection', popt_reflection[1])
+            self.cmd_interface.set('dy_reflection', popt_reflection[2])
+            self.cmd_interface.set('C_reflection', popt_reflection[3])
+
+            #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
+            if popt_reflection[2] >= popt_reflection[3]:
+                beta = 1
+            else:
+                # Gam_res is reflection coeffient Gamma of the resonator
+                Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
+                # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
+                Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
+                Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
+                # calculate phase of Gamma_cavity at resonant frequency by interpolating
+                # data.
+                Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
+                beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
+            print("Antenna coupling : {}".format(beta))
+            self.cmd_interface.set('antenna_coupling', beta)
+
+
+
+    def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False, digitization = False):
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
@@ -77,9 +148,9 @@ class DataLogger:
         print('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
         # get transmission data
+        self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
 	    #  wait for network analyzer to finish several sweeps for averaging
-        self.cmd_interface.set('switch_ps_channel_output', 0)
         time.sleep(sec_wait_for_na_averaging)
         if autoscale:
             self.cmd_interface.set('na_commands', 'autoscale')
@@ -100,7 +171,7 @@ class DataLogger:
 
 
         # get reflection data
-        self.cmd_interface.set('switch_ps_channel_output', 1)
+        self.switch_reflection_path()
         self.cmd_interface.get('s21_iq_reflection_data')
 	    #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
@@ -134,11 +205,18 @@ class DataLogger:
                 # calculate phase of Gamma_cavity at resonant frequency by interpolating
                 # data.
                 Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
-            beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
+                beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
             print("Antenna coupling : {}".format(beta))
             self.cmd_interface.set('antenna_coupling', beta)
-        print('Setting na_measurement_status to stop_measurement')
+        print('starting digitization')
+
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
+
+    def digitize(self, resonant_frequency, if_center):
+        print('Setting na_measurement_status to stop_measurement')
+        self.switch_digitization_path()
+        self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
+        self.cmd_interface('fast_daq', 'start-run')
 
     def start_modemap(self, modemap_notes = ''):
         # TODO throw error if notes isn't a string.
@@ -174,3 +252,19 @@ class DataLogger:
         lm_term = sum*v/(4*l_in_m*pi)
         resonant_frequency = n_term + lm_term*arccos_term
         return resonant_frequency
+
+    def switch_reflection_path():
+        self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        self.cmd_interface.set('switch_ps_channel_output', 1)
+
+    def switch_transmission_path():
+        self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        self.cmd_interface.set('switch_ps_select_channel', 0)
+
+    def switch_digitization_path():
+        self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        self.cmd_interface.set('switch_ps_channel_output', 1)
