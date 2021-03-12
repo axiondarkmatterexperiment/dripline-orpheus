@@ -69,6 +69,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+        print('Measuring transmission with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
@@ -95,6 +96,7 @@ class DataLogger:
             self.cmd_interface.set('C_transmission', popt_transmission[3])
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+        print('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
