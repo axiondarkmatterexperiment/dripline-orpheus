@@ -141,6 +141,7 @@ class DataLogger:
 
 
     def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+        print('VNA reflection measurement')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
@@ -213,7 +214,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def digitize(self, resonant_frequency, if_center, digitization_time):
-        print('Setting na_measurement_status to stop_measurement')
+        print('Now digitizing')
         self.switch_digitization_path()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
@@ -221,7 +222,8 @@ class DataLogger:
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
-            time.sleep(3)
+            daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+            time.sleep(1)
 
 
     def start_modemap(self, modemap_notes = ''):
