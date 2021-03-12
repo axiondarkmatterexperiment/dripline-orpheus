@@ -218,6 +218,10 @@ class DataLogger:
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
+        daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+        # check if digitizer is done digitizing.
+        while daq_status['server']['status'] == 'Running':
+            time.sleep(3)
 
 
     def start_modemap(self, modemap_notes = ''):
