@@ -4,6 +4,8 @@ general_configs:
   motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
+  if_center: 30000000
+  digitization_time: 30
 
 measurement_configs:
   empty_modemap:
@@ -18,7 +20,6 @@ measurement_configs:
     tem0018_offset: -21000000
     fitting: true
     digitize: true
-    if_center: 30000000
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm

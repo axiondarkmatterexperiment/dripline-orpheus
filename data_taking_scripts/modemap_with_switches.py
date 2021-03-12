@@ -80,7 +80,7 @@ try:
             logger.log_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
         if digitize:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-            logger.digitize(measured_fo, if_center)
+            logger.digitize(measured_fo, if_center, digitization_time)
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,

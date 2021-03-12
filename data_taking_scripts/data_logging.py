@@ -140,7 +140,7 @@ class DataLogger:
 
 
 
-    def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False, digitization = False):
+    def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         print('Setting na_measurement_status to start_measurement')
@@ -209,15 +209,16 @@ class DataLogger:
                 beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
             print("Antenna coupling : {}".format(beta))
             self.cmd_interface.set('antenna_coupling', beta)
-        print('starting digitization')
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def digitize(self, resonant_frequency, if_center):
+    def digitize(self, resonant_frequency, if_center, digitization_time):
         print('Setting na_measurement_status to stop_measurement')
         self.switch_digitization_path()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
-        self.cmd_interface('fast_daq', 'start-run')
+        self.cmd_interface.cmd('fast_daq', 'start-run')
+        time.sleep(digitization_time)
+
 
     def start_modemap(self, modemap_notes = ''):
         # TODO throw error if notes isn't a string.
