@@ -17,6 +17,6 @@ version.commit = '---'
 __all__.append("version")
 
 from .digitizer_logger import *
-from .digizer_logger import __all__ as __digitizer_logger_all
+from .digitizer_logger import __all__ as __digitizer_logger_all
 __all__ += __digitizer_logger_all
 
