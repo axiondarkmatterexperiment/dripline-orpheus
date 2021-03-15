@@ -43,7 +43,7 @@ logger = DataLogger(auths_file)
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = sweep_points)
+logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
@@ -62,8 +62,8 @@ try:
         delta_length = round((delta_length+inch_to_cm(increment_distance)),4)
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             resonant_freq = func_res_freq_interp(current_resonator_length_cm) + tem0018_offset
-            narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
-            narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
+            narrow_scan_start_freq = resonant_freq - narrow_scan_span_guess/2
+            narrow_scan_stop_freq = resonant_freq + narrow_scan_span_guess/2
 #        if override == 0:
 #            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
 #            print('')
@@ -73,11 +73,14 @@ try:
         #log transmission
         logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            logger.log_transmission_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+            resonant_freq_guess = guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, sweep_points=512)
+            narrow_scan_start_freq_focus = resonant_freq_guess-narrow_scan_span_focus/2
+            narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
+            logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
         #log reflection
         logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            logger.log_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+            logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
         if digitize:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
             logger.digitize(measured_fo, if_center, digitization_time)

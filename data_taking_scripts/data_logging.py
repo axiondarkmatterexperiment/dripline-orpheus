@@ -32,9 +32,16 @@ class DataLogger:
         if average_enable == 1:
             self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
-        #  set up traces.
-        self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
-        self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
+
+    def guess_resonant_frequency(self, start_freq, stop_freq):
+        self.switch_transmission_path()
+        s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
+        s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
+        s21_pow = s21_re**2 + s21_im**2
+        freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
+        ind_resonant = np.argmax(s21_pow)
+        resonant_f = freq[ind_resonant]
+        return resonant_f
 
     def log_motor_steps(self):
         for entitiy in self.list_of_motor_entities:
