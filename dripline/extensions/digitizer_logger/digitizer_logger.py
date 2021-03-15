@@ -23,7 +23,7 @@ class PostgresDigitizerLogger(PostgresSensorLogger):
         # combine data sources
         insert_data = {'timestamp': a_message_timestamp}
         insert_data.update(a_routing_key_data)
-        print(a_routing_key_data)
+        logger.info(a_routing_key_data)
         insert_data.update(a_payload.to_python())
         logger.info(f"insert data are:\n{insert_data}")
         if a_routing_key_data == 'fast_daq.medium_spectrum':
