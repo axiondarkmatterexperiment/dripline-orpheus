@@ -3,6 +3,7 @@ from dripline.implementations import PostgresSensorLogger
 import logging
 logger = logging.getLogger(__name__)
 import time
+import numpy as np
 
 __all__ = []
 
@@ -23,13 +24,12 @@ class PostgresDigitizerLogger(PostgresSensorLogger):
         # combine data sources
         insert_data = {'timestamp': a_message_timestamp}
         insert_data.update(a_routing_key_data)
-        logger.info(a_routing_key_data)
         insert_data.update(a_payload.to_python())
         logger.info(f"insert data are:\n{insert_data}")
-        if a_routing_key_data == 'fast_daq.medium_spectrum':
+        if insert_data['sensor_name']=='medium_spectrum':
             calculated_integrated_power = np.sum(insert_data['value_raw'])
             self._python_interface.set(self._integrated_power_endpoint, calculated_integrated_power)
-            self._python_interface.cdm(self._integrated_power_endpoint, "scheduled_log")
+            self._python_interface.cmd(self._integrated_power_endpoint, "scheduled_log")
         # do the insert
         this_data_table.do_insert(**insert_data)
         logger.info("finished processing data")
