@@ -5,7 +5,7 @@ import pkg_resources
 import scarab
 a_ver = '0.0.0' #note that this is updated in the following block
 try:
-    a_ver = pkg_resources.get_distribution('entities_snapshotter_plugin').version
+    a_ver = pkg_resources.get_distribution('digitizer_logger_plugin').version
     print('version is: {}'.format(a_ver))
 except:
     print('fail!')
