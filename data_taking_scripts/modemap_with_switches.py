@@ -60,20 +60,27 @@ try:
     override = 1
     while delta_length < abs(distance_to_move):
         delta_length = round((delta_length+inch_to_cm(increment_distance)),4)
-        if override == 0:
-            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
-            print('')
-            if prompt == 'o':
-                override = 1
-        print('Resonator length: {}'.format(current_resonator_length_cm))
-        #log widescan
-        logger.log_transmission_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             resonant_freq = func_res_freq_interp(current_resonator_length_cm) + tem0018_offset
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
-            #log narrowscan
-            logger.log_transmission_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
+#        if override == 0:
+#            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
+#            print('')
+#            if prompt == 'o':
+#                override = 1
+        print('Resonator length: {}'.format(current_resonator_length_cm))
+        #log transmission
+        logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
+        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
+            logger.log_transmission_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+        #log reflection
+        logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
+        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
+            logger.log_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+        if digitize:
+            measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
+            logger.digitize(measured_fo, if_center, digitization_time)
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,

@@ -1,22 +1,25 @@
 general_configs:
   num_plates: 4
-  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+    #motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+  motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
+  if_center: 30000000
+  digitization_time: 30
 
 measurement_configs:
   empty_modemap:
     initial_mirror_holder_spacing: 15 #length in cm
-    sec_wait_for_na_averaging: 10 #time in seconds
-    sec_wait_for_na_averaging_transmission: 10 #time in seconds
-    sec_wait_for_na_averaging_reflection: 4 #time in seconds
+    sec_wait_for_na_averaging: 6 #time in seconds
     average_enable: 1 # 1 or 0
     sweep_points: 1000
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
-    narrow_scan_span: 70000000
-    tem0018_offset: -15000000
+    narrow_scan_span: 50000000
+    tem0018_offset: -21000000
+    fitting: true
+    digitize: true
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm
