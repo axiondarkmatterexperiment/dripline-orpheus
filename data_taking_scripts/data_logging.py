@@ -33,8 +33,12 @@ class DataLogger:
             self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
 
-    def guess_resonant_frequency(self, start_freq, stop_freq):
+    def guess_resonant_frequency(self, start_freq, stop_freq, average_time = 2):
+        self.cmd_interface.set('na_start_freq', start_freq)
+        self.cmd_interface.set('na_stop_freq', stop_freq)
         self.switch_transmission_path()
+        s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
+        time.sleep(average_time)
         s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
         s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
         s21_pow = s21_re**2 + s21_im**2
@@ -42,7 +46,7 @@ class DataLogger:
         ind_resonant = np.argmax(s21_pow)
         resonant_f = freq[ind_resonant]
         return resonant_f
-
+        
     def log_motor_steps(self):
         for entitiy in self.list_of_motor_entities:
             self.cmd_interface.cmd(entitiy, 'scheduled_log')
@@ -101,6 +105,7 @@ class DataLogger:
             self.cmd_interface.set('Q_transmission', popt_transmission[1])
             self.cmd_interface.set('dy_transmission', popt_transmission[2])
             self.cmd_interface.set('C_transmission', popt_transmission[3])
+        self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
         print('Measuring reflection with VNA')
@@ -146,6 +151,7 @@ class DataLogger:
                 beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
             print("Antenna coupling : {}".format(beta))
             self.cmd_interface.set('antenna_coupling', beta)
+        self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
 
 
