@@ -73,7 +73,7 @@ try:
         #log transmission
         logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
-            resonant_freq_guess = guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq)
+            resonant_freq_guess = logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq)
             narrow_scan_start_freq_focus = resonant_freq_guess-narrow_scan_span_focus/2
             narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
             logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
