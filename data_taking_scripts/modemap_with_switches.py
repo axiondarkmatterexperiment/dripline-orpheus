@@ -60,7 +60,6 @@ try:
     override = 1
     while delta_length < abs(distance_to_move):
         delta_length = round((delta_length+inch_to_cm(increment_distance)),4)
-        if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
 #        if override == 0:
 #            prompt = input("Press 'o' to override this prompt. Press any other key to continue: ")
 #            print('')
