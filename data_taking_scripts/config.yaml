@@ -18,7 +18,7 @@ measurement_configs:
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
     narrow_scan_span_guess: 600000000
-    narrow_scan_span_focus: 100000000
+    narrow_scan_span_focus: 50000000
     tem0018_offset: -21000000
     fitting: true
     digitize: false
