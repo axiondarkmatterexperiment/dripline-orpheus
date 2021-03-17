@@ -106,9 +106,13 @@ class DataLogger:
             print('Transmission lorentzian fitted parameters')
             print(popt_transmission)
             self.cmd_interface.set('f_transmission', popt_transmission[0])
+            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
             self.cmd_interface.set('Q_transmission', popt_transmission[1])
+            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
             self.cmd_interface.set('dy_transmission', popt_transmission[2])
+            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
             self.cmd_interface.set('C_transmission', popt_transmission[3])
+            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
@@ -186,9 +190,13 @@ class DataLogger:
             print('Transmission lorentzian fitted parameters')
             print(popt_transmission)
             self.cmd_interface.set('f_transmission', popt_transmission[0])
+            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
             self.cmd_interface.set('Q_transmission', popt_transmission[1])
+            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
             self.cmd_interface.set('dy_transmission', popt_transmission[2])
+            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
             self.cmd_interface.set('C_transmission', popt_transmission[3])
+            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
 
 
         # get reflection data
@@ -210,9 +218,13 @@ class DataLogger:
             print('Reflection lorentzian fitted parameters')
             print(popt_reflection)
             self.cmd_interface.set('f_reflection', popt_reflection[0])
+            self.cmd_interface.set('sig_f_reflection', perr_reflection[0])
             self.cmd_interface.set('Q_reflection', popt_reflection[1])
+            self.cmd_interface.set('sig_Q_reflection', perr_reflection[1])
             self.cmd_interface.set('dy_reflection', popt_reflection[2])
+            self.cmd_interface.set('sig_dy_reflection', perr_reflection[2])
             self.cmd_interface.set('C_reflection', popt_reflection[3])
+            self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
 
             #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
             if popt_reflection[2] >= popt_reflection[3]:
