@@ -14,7 +14,7 @@ measurement_configs:
     sec_wait_for_na_averaging: 6 #time in seconds
     average_enable: 1 # 1 or 0
     sweep_points: 1000
-    averages: 32 # value doesn't matter is averable_enable = 0
+    averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
     ifile_predicted_resonances: empty_analytical_resonances.txt
     narrow_scan_span_guess: 600000000
@@ -22,6 +22,7 @@ measurement_configs:
     tem0018_offset: -21000000
     fitting: true
     digitize: false
+    averaging_time_for_fo_guess_measurement: 3
 
   dielectric_modemap:
     initial_mirror_holder_spacing: 12.55 #length in cm
