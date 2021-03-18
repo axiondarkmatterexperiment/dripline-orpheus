@@ -94,7 +94,7 @@ try:
 except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
-    logger.stop_modemap()
+    #logger.stop_modemap()
 
 the_interface.set('switch_ps_channel_output', 0)
 logger.stop_modemap()
