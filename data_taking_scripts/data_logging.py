@@ -304,7 +304,6 @@ class DataLogger:
 
     def switch_transmission_path(self):
         print('Switching to transmission path')
-        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
