@@ -292,16 +292,27 @@ class DataLogger:
         return resonant_frequency
 
     def switch_reflection_path(self):
+        print('Switching to transmission path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 1)
+        time.sleep(0.1)
 
     def switch_transmission_path(self):
+        print('Switching to transmission path')
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.1)
 
     def switch_digitization_path(self):
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
