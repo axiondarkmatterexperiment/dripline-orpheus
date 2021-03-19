@@ -231,8 +231,10 @@ class DataLogger:
             cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
             phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
             
-            cavity_reflection_at_resonance = (popt_reflection[3]-popt_reflection[2])/popt_reflection[3]
+            cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
 
+            if popt_reflection[2] >= popt_reflection[3]:
+                beta = 1
             antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
 
             print("Antenna coupling : {}".format(antenna_coupling))
