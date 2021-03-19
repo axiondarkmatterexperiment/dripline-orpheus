@@ -5,6 +5,7 @@ import numpy as np
 from fitting_functions import data_lorentzian_fit
 from fitting_functions import calculate_coupling
 from fitting_functions import reflection_deconvolve_line
+from fitting_functions import reflection_deconvolve_phase
 from scipy.interpolate import interp1d
 from fitting_functions import func_pow_reflected
 
@@ -226,13 +227,13 @@ class DataLogger:
             self.cmd_interface.set('C_reflection', popt_reflection[3])
             self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
 
-            cavity_phase = cf.deconvolve_phase(s11_freq, s11_phase)
+            cavity_phase = deconvolve_phase(s11_freq, s11_phase)
             cavity_reflection_interp_phase = interp1d(s11_freq, cavity_phase, kind='cubic')
             phase_at_resonance = cavity_reflection_interp_phase(s11_popt[0])
             
             cavity_reflection_at_resonance = (popt_reflection[3]-popt_reflection[2])/popt_reflection[3]
 
-            antenna_coupling = cf.calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+            antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
 
             print("Antenna coupling : {}".format(antenna_coupling))
             self.cmd_interface.set('antenna_coupling', antenna_coupling)
