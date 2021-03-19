@@ -226,21 +226,16 @@ class DataLogger:
             self.cmd_interface.set('C_reflection', popt_reflection[3])
             self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
 
-            #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
-            if popt_reflection[2] >= popt_reflection[3]:
-                beta = 1
-            else:
-                # Gam_res is reflection coeffient Gamma of the resonator
-                Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
-                # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
-                Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
-                Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
-                # calculate phase of Gamma_cavity at resonant frequency by interpolating
-                # data.
-                Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
-                beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
-            print("Antenna coupling : {}".format(beta))
-            self.cmd_interface.set('antenna_coupling', beta)
+            cavity_phase = cf.deconvolve_phase(s11_freq, s11_phase)
+            cavity_reflection_interp_phase = interp1d(s11_freq, cavity_phase, kind='cubic')
+            phase_at_resonance = cavity_reflection_interp_phase(s11_popt[0])
+            
+            cavity_reflection_at_resonance = (popt_reflection[3]-popt_reflection[2])/popt_reflection[3]
+
+            antenna_coupling = cf.calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+
+            print("Antenna coupling : {}".format(antenna_coupling))
+            self.cmd_interface.set('antenna_coupling', antenna_coupling)
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
     def digitize(self, resonant_frequency, if_center, digitization_time):
