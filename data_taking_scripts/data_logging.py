@@ -5,7 +5,7 @@ import numpy as np
 from fitting_functions import data_lorentzian_fit
 from fitting_functions import calculate_coupling
 from fitting_functions import reflection_deconvolve_line
-from fitting_functions import reflection_deconvolve_phase
+from fitting_functions import deconvolve_phase
 from scipy.interpolate import interp1d
 from fitting_functions import func_pow_reflected
 
