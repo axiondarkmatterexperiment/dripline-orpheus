@@ -228,7 +228,7 @@ class DataLogger:
             self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
 
             cavity_phase = deconvolve_phase(freq, s11_phase)
-            cavity_reflection_interp_phase = interp1d(s11_freq, cavity_phase, kind='cubic')
+            cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
             phase_at_resonance = cavity_reflection_interp_phase(s11_popt[0])
             
             cavity_reflection_at_resonance = (popt_reflection[3]-popt_reflection[2])/popt_reflection[3]
