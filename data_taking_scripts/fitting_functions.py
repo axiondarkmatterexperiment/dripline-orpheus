@@ -124,6 +124,18 @@ def reflection_deconvolve_line(f, Gamma_mag, Gamma_phase, C_fit):
 
     return Gamma_cav_mag, Gamma_cav_phase
 
+
+def deconvolve_phase(freq, measured_reflected_phase):
+    '''Removes the effects of the transmission line on the measured phase'''
+    # assume that the phase change due to the transmission line is linear
+    f_ends = get_arr_ends(freq, 5)
+    phase_ends = get_arr_ends(measured_reflected_phase, 5)
+    interp_phase_wo_notch = np.poly1d(np.polyfit(f_ends, phase_ends, 1))
+    delay_phase = interp_phase_wo_notch(freq)
+    # calculate the phase change due to the cavity by subtracting the phase change due to the transmission line.
+    deconvolved_phase = measured_reflected_phase - delay_phase
+    return deconvolved_phase
+
 def calculate_coupling(mag_fo, phase_fo):
     """Calculate coupling to a cavity after reflection fit is done"""
     # TODO add error propogation
