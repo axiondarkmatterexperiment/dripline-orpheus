@@ -214,31 +214,44 @@ class DataLogger:
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
-            popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
-            perr_reflection = np.sqrt(np.diag(pcov_reflection))
-            print('Reflection lorentzian fitted parameters')
-            print(popt_reflection)
-            self.cmd_interface.set('f_reflection', popt_reflection[0])
-            self.cmd_interface.set('sig_f_reflection', perr_reflection[0])
-            self.cmd_interface.set('Q_reflection', popt_reflection[1])
-            self.cmd_interface.set('sig_Q_reflection', perr_reflection[1])
-            self.cmd_interface.set('dy_reflection', popt_reflection[2])
-            self.cmd_interface.set('sig_dy_reflection', perr_reflection[2])
-            self.cmd_interface.set('C_reflection', popt_reflection[3])
-            self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
+            try:
+                popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
+                perr_reflection = np.sqrt(np.diag(pcov_reflection))
 
-            cavity_phase = deconvolve_phase(freq, s11_phase)
-            cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
-            phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
-            
-            cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
+                print('Reflection lorentzian fitted parameters')
+                print(popt_reflection)
+                self.cmd_interface.set('f_reflection', popt_reflection[0])
+                self.cmd_interface.set('sig_f_reflection', perr_reflection[0])
+                self.cmd_interface.set('Q_reflection', popt_reflection[1])
+                self.cmd_interface.set('sig_Q_reflection', perr_reflection[1])
+                self.cmd_interface.set('dy_reflection', popt_reflection[2])
+                self.cmd_interface.set('sig_dy_reflection', perr_reflection[2])
+                self.cmd_interface.set('C_reflection', popt_reflection[3])
+                self.cmd_interface.set('sig_C_reflection', perr_reflection[3])
 
-            if popt_reflection[2] >= popt_reflection[3]:
-                beta = 1
-            antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+                cavity_phase = deconvolve_phase(freq, s11_phase)
+                cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
+                phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
 
-            print("Antenna coupling : {}".format(antenna_coupling))
-            self.cmd_interface.set('antenna_coupling', antenna_coupling)
+                if popt_reflection[2] >= popt_reflection[3]:
+                    antenna_coupling = 1
+                else:
+                    cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
+                    antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+
+                print("Antenna coupling : {}".format(antenna_coupling))
+                self.cmd_interface.set('antenna_coupling', antenna_coupling)
+            except OptimizeWarning:
+                print('Could not perform a proper fit')
+
+                self.cmd_interface.set('f_reflection', 0)
+                self.cmd_interface.set('sig_f_reflection', 0)
+                self.cmd_interface.set('Q_reflection', 0)
+                self.cmd_interface.set('sig_Q_reflection', 0)
+                self.cmd_interface.set('dy_reflection', 0)
+                self.cmd_interface.set('sig_dy_reflection', 0)
+                self.cmd_interface.set('C_reflection', 0)
+                self.cmd_interface.set('sig_C_reflection', 0)
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
     def digitize(self, resonant_frequency, if_center, digitization_time):
