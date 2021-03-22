@@ -190,6 +190,7 @@ class DataLogger:
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
             print('Transmission lorentzian fitted parameters')
             print(popt_transmission)
+            print(perr_transmission)
             self.cmd_interface.set('f_transmission', popt_transmission[0])
             self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
             self.cmd_interface.set('Q_transmission', popt_transmission[1])
@@ -220,6 +221,7 @@ class DataLogger:
 
                 print('Reflection lorentzian fitted parameters')
                 print(popt_reflection)
+                print(perr_reflection)
                 self.cmd_interface.set('f_reflection', popt_reflection[0])
                 self.cmd_interface.set('sig_f_reflection', perr_reflection[0])
                 self.cmd_interface.set('Q_reflection', popt_reflection[1])
@@ -241,7 +243,7 @@ class DataLogger:
 
                 print("Antenna coupling : {}".format(antenna_coupling))
                 self.cmd_interface.set('antenna_coupling', antenna_coupling)
-            except OptimizeWarning:
+            except:
                 print('Could not perform a proper fit')
 
                 self.cmd_interface.set('f_reflection', 0)
