@@ -52,6 +52,7 @@ print('Starting modemap measurement')
 logger.start_modemap(measurement_description)
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
+the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
@@ -88,6 +89,8 @@ try:
                                                                                              current_plate_separation)
         orpheus_motors.wait_for_motors()
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
+
+        the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
         print("plate separation: {}".format(current_plate_separation))
 
