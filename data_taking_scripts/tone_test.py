@@ -16,15 +16,12 @@ def tone_from_vna(frequency, power):
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 logger = DataLogger(auths_file)
 
-gain = 50 #dB
+vna_power_limits = [-15, -5]
+gain = 16 #dB
 tone_frequency =  16.5e9
-target_tone_power = 28-gain #aim for 28 dBm at digitizer input. Do not exceed 34 dBm at digitizer input.
+#target_tone_power = 28-gain #aim for 28 dBm at digitizer input. Do not exceed 34 dBm at digitizer input.
+target_tone_power = -15 #let's just be safe.
 
-vna_power = the_interface.get('na_power')
 
-if vna_power > target_tone_power:
-    print('VNA power cant go as low as needed. Exiting program')
-    sys.exit()
-#else:
-#    tone_with_vna(tone_frequency, target_tone_power)
-#    logger.digitize(injected_tone, if_center, digitization_time)
+tone_with_vna(tone_frequency, target_tone_power)
+#logger.digitize(injected_tone, if_center, digitization_time)
