@@ -267,6 +267,7 @@ class DataLogger:
         while daq_status['server']['status'] == 'Running':
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
+        print('Done digitizing')
 
 
     def start_modemap(self, modemap_notes = ''):
