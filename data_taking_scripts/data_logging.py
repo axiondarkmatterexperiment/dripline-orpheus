@@ -271,7 +271,6 @@ class DataLogger:
         print('Now digitizing')
         self.switch_digitization_path()
         self.disable_all_motors()
-        self.enable_all_motors()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
@@ -280,6 +279,7 @@ class DataLogger:
         while daq_status['server']['status'] == 'Running':
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
+        self.enable_all_motors()
         print('Done digitizing')
 
 
