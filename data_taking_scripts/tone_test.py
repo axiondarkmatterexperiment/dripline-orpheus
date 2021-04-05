@@ -10,7 +10,7 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 def tone_with_vna(frequency, power):
     the_interface.set('na_center_freq', frequency)
     the_interface.set('na_freq_span', 0)
-    the_interface.set('na_if_bw', 0)
+    the_interface.set('na_if_band', 0)
     the_interface.set('na_power', power)
 
 logger = DataLogger(auths_file)

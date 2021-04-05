@@ -13,4 +13,4 @@ rf_center_frequency =  16.5e9
 if_center = 30e6
 digitization_time = 30
 
-logger.digitize(tone_frequency, if_center, digitization_time)
+logger.digitize(rf_center_frequency, if_center, digitization_time)
