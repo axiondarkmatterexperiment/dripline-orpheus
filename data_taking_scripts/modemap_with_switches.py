@@ -26,9 +26,9 @@ def cm_to_inch(dist):
 def inch_to_cm(dist):
     return dist*2.54
 
-distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
-resolution = int(input('Enter the number of measurements needed: '))
-increment_distance = cm_to_inch(distance_to_move/resolution)
+#distance_to_move = float(input('Enter the distance to move in cm (Empty resonator modemap is usually 3): '))
+#resolution = int(input('Enter the number of measurements needed: '))
+increment_distance = cm_to_inch(distance_to_move/number_of_measurement_points)
 
 if narrow_scan:
     resonances_and_lengths = np.loadtxt(ifile_predicted_resonances, skiprows = 1,delimiter = ',')
