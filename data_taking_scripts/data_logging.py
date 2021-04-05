@@ -256,9 +256,22 @@ class DataLogger:
                 self.cmd_interface.set('sig_C_reflection', 0)
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
+
+    def disable_all_motors(self):
+        self.cmd_interface.set('curved_mirror_status_command', 'motor_disable')
+        self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_disable')
+        self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_disable')
+
+    def enable_all_motors(self):
+        self.cmd_interface.set('curved_mirror_status_command', 'motor_enable')
+        self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_enable')
+        self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
+
     def digitize(self, resonant_frequency, if_center, digitization_time):
         print('Now digitizing')
         self.switch_digitization_path()
+        self.disable_all_motors()
+        self.enable_all_motors()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
