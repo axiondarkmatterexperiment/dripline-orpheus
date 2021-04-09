@@ -50,7 +50,7 @@ orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
 #Send alert saying you are starting the modemap measurement
-logger.info('Starting modemap measurement')
+dl_logger.info('Starting modemap measurement')
 data_logger.start_modemap(measurement_description)
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
@@ -68,7 +68,7 @@ try:
 #            print('')
 #            if prompt == 'o':
 #                override = 1
-        logger.info('Resonator length: {}'.format(current_resonator_length_cm))
+        dl_logger.info('Resonator length: {}'.format(current_resonator_length_cm))
         #log transmission
         data_logger.log_transmission_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
@@ -84,7 +84,7 @@ try:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
             data_logger.digitize(measured_fo, if_center, digitization_time)
 
-        logger.info("now scanning distance = " +str(delta_length))
+        dl_logger.info("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
@@ -94,10 +94,10 @@ try:
 
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
-        logger.info("plate separation: {}".format(current_plate_separation))
+        dl_logger.info("plate separation: {}".format(current_plate_separation))
 
 except KeyboardInterrupt:
-    logger.info('stopping motors and modemap measurement')
+    dl_logger.info('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
     #data_logger.stop_modemap()
 
