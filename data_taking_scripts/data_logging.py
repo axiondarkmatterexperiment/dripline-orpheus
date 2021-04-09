@@ -8,6 +8,7 @@ from fitting_functions import reflection_deconvolve_line
 from fitting_functions import deconvolve_phase
 from scipy.interpolate import interp1d
 from fitting_functions import func_pow_reflected
+import logging
 dl_logger = logging.getLogger(__name__)
 
 class DataLogger:
