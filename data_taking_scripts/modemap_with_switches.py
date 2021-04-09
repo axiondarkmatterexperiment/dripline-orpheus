@@ -4,6 +4,7 @@ import numpy as np
 from scipy import interpolate
 import yaml
 from dripline.core import Interface
+dl_logger = logging.getLogger(__name__)
 
 config_file = open("config.yaml")
 configs = yaml.load(config_file, Loader =yaml.FullLoader)
@@ -36,20 +37,20 @@ if narrow_scan:
     predicted_resonances = resonances_and_lengths[:,1]
     func_res_freq_interp = interpolate.interp1d(predicted_lengths, predicted_resonances, kind='cubic')
 
-#set up motors and logger
+#set up motors and data logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
-logger = DataLogger(auths_file)
+data_logger = DataLogger(auths_file)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
+data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
 #Send alert saying you are starting the modemap measurement
-print('Starting modemap measurement')
-logger.start_modemap(measurement_description)
+logger.info('Starting modemap measurement')
+data_logger.start_modemap(measurement_description)
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
@@ -66,23 +67,23 @@ try:
 #            print('')
 #            if prompt == 'o':
 #                override = 1
-        print('Resonator length: {}'.format(current_resonator_length_cm))
+        logger.info('Resonator length: {}'.format(current_resonator_length_cm))
         #log transmission
-        logger.log_transmission_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
+        data_logger.log_transmission_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             resonant_freq = func_res_freq_interp(current_resonator_length_cm) + tem0018_offset
             narrow_scan_start_freq = resonant_freq - narrow_scan_span_guess/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span_guess/2
-            resonant_freq_guess = logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
+            resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
             narrow_scan_start_freq_focus = resonant_freq_guess-narrow_scan_span_focus/2
             narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
-            logger.log_transmission_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+            data_logger.log_transmission_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
 
         if digitize:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-            logger.digitize(measured_fo, if_center, digitization_time)
+            data_logger.digitize(measured_fo, if_center, digitization_time)
 
-        print("now scanning distance = " +str(delta_length))
+        logger.info("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
@@ -92,15 +93,15 @@ try:
 
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
-        print("plate separation: {}".format(current_plate_separation))
+        logger.info("plate separation: {}".format(current_plate_separation))
 
 except KeyboardInterrupt:
-    print('stopping motors and modemap measurement')
+    logger.info('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
-    #logger.stop_modemap()
+    #data_logger.stop_modemap()
 
 the_interface.set('switch_ps_select_channel', 'CH1')
 the_interface.set('switch_ps_channel_output', 0)
 the_interface.set('switch_ps_select_channel', 'CH2')
 the_interface.set('switch_ps_channel_output', 0)
-logger.stop_modemap()
+data_logger.stop_modemap()
