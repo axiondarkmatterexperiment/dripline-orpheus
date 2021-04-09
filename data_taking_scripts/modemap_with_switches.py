@@ -5,6 +5,7 @@ from scipy import interpolate
 import yaml
 from dripline.core import Interface
 import logging
+logging.basicConfig(level=logging.INFO)
 dl_logger = logging.getLogger(__name__)
 
 config_file = open("config.yaml")
