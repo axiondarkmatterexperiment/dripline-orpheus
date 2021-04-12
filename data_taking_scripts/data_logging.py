@@ -8,6 +8,9 @@ from fitting_functions import reflection_deconvolve_line
 from fitting_functions import deconvolve_phase
 from scipy.interpolate import interp1d
 from fitting_functions import func_pow_reflected
+import logging
+logging.basicConfig(level=logging.INFO)
+dl_logger = logging.getLogger(__name__)
 
 class DataLogger:
 
@@ -70,10 +73,10 @@ class DataLogger:
     def log_vna_data(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False):
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
-        print('Setting na_measurement_status to start_measurement')
+        dl_logger.info('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        print('Logging list of endpoints')
+        dl_logger.info('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
 	#  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
@@ -81,17 +84,17 @@ class DataLogger:
             self.cmd_interface.set('na_commands', 'autoscale')
         self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
         self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
-        print('Setting na_measurement_status to stop_measurement')
+        dl_logger.info('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
-        print('Measuring transmission with VNA')
+        dl_logger.info('Measuring transmission with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
-        print('Setting na_measurement_status to start_measurement')
+        dl_logger.info('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        print('Logging list of endpoints')
+        dl_logger.info('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
         self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
@@ -104,8 +107,8 @@ class DataLogger:
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
             popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
-            print('Transmission lorentzian fitted parameters')
-            print(popt_transmission)
+            dl_logger.info('Transmission lorentzian fitted parameters')
+            dl_logger.info(popt_transmission)
             self.cmd_interface.set('f_transmission', popt_transmission[0])
             self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
             self.cmd_interface.set('Q_transmission', popt_transmission[1])
@@ -117,13 +120,13 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
-        print('Measuring reflection with VNA')
+        dl_logger.info('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
-        print('Setting na_measurement_status to start_measurement')
+        dl_logger.info('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        print('Logging list of endpoints')
+        dl_logger.info('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
         self.switch_reflection_path()
         self.cmd_interface.get('s21_iq_reflection_data')
@@ -138,8 +141,8 @@ class DataLogger:
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
             popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
-            print('Reflection lorentzian fitted parameters')
-            print(popt_reflection)
+            dl_logger.info('Reflection lorentzian fitted parameters')
+            dl_logger.info(popt_reflection)
             self.cmd_interface.set('f_reflection', popt_reflection[0])
             self.cmd_interface.set('Q_reflection', popt_reflection[1])
             self.cmd_interface.set('dy_reflection', popt_reflection[2])
@@ -158,20 +161,20 @@ class DataLogger:
                 # data.
                 Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
                 beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
-            print("Antenna coupling : {}".format(beta))
+            dl_logger.info("Antenna coupling : {}".format(beta))
             self.cmd_interface.set('antenna_coupling', beta)
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
 
 
     def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
-        print('VNA reflection measurement')
+        dl_logger.info('VNA reflection measurement')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
-        print('Setting na_measurement_status to start_measurement')
+        dl_logger.info('Setting na_measurement_status to start_measurement')
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        print('Logging list of endpoints')
+        dl_logger.info('Logging list of endpoints')
         self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
         # get transmission data
         self.switch_transmission_path()
@@ -188,9 +191,9 @@ class DataLogger:
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
             popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
-            print('Transmission lorentzian fitted parameters')
-            print(popt_transmission)
-            print(perr_transmission)
+            dl_logger.info('Transmission lorentzian fitted parameters')
+            dl_logger.info(popt_transmission)
+            dl_logger.info(perr_transmission)
             self.cmd_interface.set('f_transmission', popt_transmission[0])
             self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
             self.cmd_interface.set('Q_transmission', np.abs(popt_transmission[1]))
@@ -219,9 +222,9 @@ class DataLogger:
                 popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
                 perr_reflection = np.sqrt(np.diag(pcov_reflection))
 
-                print('Reflection lorentzian fitted parameters')
-                print(popt_reflection)
-                print(perr_reflection)
+                dl_logger.info('Reflection lorentzian fitted parameters')
+                dl_logger.info(popt_reflection)
+                dl_logger.info(perr_reflection)
                 self.cmd_interface.set('f_reflection', popt_reflection[0])
                 self.cmd_interface.set('sig_f_reflection', perr_reflection[0])
                 self.cmd_interface.set('Q_reflection', np.abs(popt_reflection[1]))
@@ -241,10 +244,10 @@ class DataLogger:
                     cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
                     antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
 
-                print("Antenna coupling : {}".format(antenna_coupling))
+                dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
                 self.cmd_interface.set('antenna_coupling', antenna_coupling)
             except:
-                print('Could not perform a proper fit')
+                dl_logger.warning('Could not perform a proper fit')
 
                 self.cmd_interface.set('f_reflection', 0)
                 self.cmd_interface.set('sig_f_reflection', 0)
@@ -268,7 +271,7 @@ class DataLogger:
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
 
     def digitize(self, resonant_frequency, if_center, digitization_time):
-        print('Now digitizing')
+        dl_logger.info('Now digitizing')
         self.switch_digitization_path()
         self.disable_all_motors()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
@@ -280,7 +283,7 @@ class DataLogger:
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
         self.enable_all_motors()
-        print('Done digitizing')
+        dl_logger.info('Done digitizing')
 
 
     def start_modemap(self, modemap_notes = ''):
@@ -319,7 +322,7 @@ class DataLogger:
         return resonant_frequency
 
     def switch_reflection_path(self):
-        print('Switching to reflection path')
+        dl_logger.info('Switching to reflection path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
@@ -330,7 +333,7 @@ class DataLogger:
         time.sleep(0.1)
 
     def switch_transmission_path(self):
-        print('Switching to transmission path')
+        dl_logger.info('Switching to transmission path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 0)
@@ -341,7 +344,7 @@ class DataLogger:
         time.sleep(0.1)
 
     def switch_digitization_path(self):
-        print('Switching to digitization path')
+        dl_logger.info('Switching to digitization path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 1)
