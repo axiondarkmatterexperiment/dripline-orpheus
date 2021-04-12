@@ -34,8 +34,6 @@ orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 data_logger = DataLogger(auths_file)
 
 data_logger.initialize_na_settings_for_modemap(average_enable = 0, sweep_points = sweep_points)
-orpheus_motors.move_to_zero()
-orpheus_motors.wait_for_motors()
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
