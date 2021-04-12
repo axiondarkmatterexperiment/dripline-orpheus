@@ -3,6 +3,10 @@ from data_logging import DataLogger
 import numpy as np
 from scipy import interpolate
 import yaml
+from dripline.core import Interface
+import logging
+logging.basicConfig(level=logging.INFO)
+dl_logger = logging.getLogger(__name__)
 
 def cm_to_inch(dist):
     return dist/2.54
