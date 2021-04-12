@@ -39,7 +39,7 @@ current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
-the_interface.set('target_fo', starting_f0)
+the_interface.set('target_fo', starting_fo)
 
 try:
     delta_length = 0
@@ -48,7 +48,7 @@ try:
 #take transmission measurement
         data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
-        target_fo = the_interface.get('target_fo')
+        target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
         narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
