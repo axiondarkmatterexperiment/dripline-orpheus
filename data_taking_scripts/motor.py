@@ -120,7 +120,7 @@ class OrpheusMotors:
             motor.move_to_zero()
 
     def move_by_increment(self, increment_distance,cavity_length_tracker,
-                          num_plates, initial_plate_separation):
+                          num_plates, plate_separation):
         ''' Moves initialized motors in a coordinated manner.
             Keeps the dielectric plates even spaced.
             Returns the new resonator length and the new separation
@@ -138,7 +138,7 @@ class OrpheusMotors:
 
         if 'bottom_dielectric_plate' in self.motor_names:
             bdp_ind = self.motor_names.index('bottom_dielectric_plate')
-            diff = initial_plate_separation +increment_distance
+            diff = plate_separation +increment_distance
             move_bottom_plate = diff - new_plate_separation
             bottom_plate_steps = self.distance_to_steps(move_bottom_plate)
             print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
@@ -146,7 +146,7 @@ class OrpheusMotors:
 
         if 'top_dielectric_plate' in self.motor_names:
             tdp_ind = self.motor_names.index('top_dielectric_plate')
-            move_top_plate = new_plate_separation - initial_plate_separation
+            move_top_plate = new_plate_separation - plate_separation
             top_plate_steps = self.distance_to_steps(move_top_plate)
             print(F'Moving top plate motor by {top_plate_steps} steps')
             self.motors[tdp_ind].move_steps(top_plate_steps)
