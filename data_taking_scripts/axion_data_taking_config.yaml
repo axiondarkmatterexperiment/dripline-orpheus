@@ -1,0 +1,22 @@
+general_configs:
+  num_plates: 4
+  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+  wide_scan_start_freq: 15000000000
+  wide_scan_stop_freq: 18000000000
+  digitization_time: 30
+  vna_power: -5
+  if_center: 30000000
+
+measurement_configs:
+  empty_resonator:
+    initial_mirror_holder_spacing: 15.6 # cm
+    starting_f0: 17448000000 # expected TEM_00-18 mode at initial spacing.
+    sweep_points: 1000
+    increment_distance: 0.127 #cm, 0.05", 20000 motor steps. 1 full motor revolution
+    distance_to_move: 2 # cm
+    sec_wait_for_na_averaging: 4
+    averages: 16
+    narrow_scan_span_guess: 600000000
+    narrow_scan_span_focus: 10000000
+    averaging_time_for_fo_guess_measurement: 2
+
