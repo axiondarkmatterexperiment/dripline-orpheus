@@ -13,7 +13,7 @@ def tone_with_vna(frequency, power):
     the_interface.set('na_if_band', 0)
     the_interface.set('na_power', power)
 
-logger = DataLogger(auths_file)
+data_logger = DataLogger(auths_file)
 
 vna_power_limits = [-15, -5]
 gain = 16 #dB
@@ -25,4 +25,4 @@ target_tone_power = -15 #let's just be safe.
 
 
 tone_with_vna(tone_frequency, target_tone_power)
-logger.digitize(tone_frequency, if_center, digitization_time)
+data_logger.digitize(tone_frequency, if_center, digitization_time)

@@ -33,20 +33,20 @@ if narrow_scan:
     predicted_resonances = resonances_and_lengths[:,1]
     func_res_freq_interp = interpolate.interp1d(predicted_lengths, predicted_resonances, kind='cubic')
 
-#set up motors and logger
+#set up motors and data_logger
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
-logger = DataLogger(auths_file)
+data_logger = DataLogger(auths_file)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
 
-logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = sweep_points)
+data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, sweep_points = sweep_points)
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
 #Send alert saying you are starting the modemap measurement
 print('Starting modemap measurement')
-logger.start_modemap(measurement_description)
+data_logger.start_modemap(measurement_description)
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
@@ -64,13 +64,13 @@ try:
                 override = 1
         print('Resonator length: {}'.format(current_resonator_length_cm))
         #log widescan
-        logger.log_vna_data(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
+        data_logger.log_vna_data(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'widescan')
         if narrow_scan and (predicted_lengths[0]<current_resonator_length_cm<predicted_lengths[-1]):
             resonant_freq = func_res_freq_interp(current_resonator_length_cm)
             narrow_scan_start_freq = resonant_freq - narrow_scan_span/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span/2
             #log narrowscan
-            logger.log_vna_data(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
+            data_logger.log_vna_data(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan')
 
         print("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
@@ -85,5 +85,5 @@ try:
 except KeyboardInterrupt:
     print('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
-    logger.stop_modemap()
-logger.stop_modemap()
+    data_logger.stop_modemap()
+data_logger.stop_modemap()
