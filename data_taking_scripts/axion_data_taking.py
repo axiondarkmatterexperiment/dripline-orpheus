@@ -35,6 +35,9 @@ data_logger = DataLogger(auths_file)
 
 data_logger.initialize_na_settings_for_modemap(average_enable = 0, sweep_points = sweep_points)
 
+#send alert saying you're starting axion data taking
+data_logger.start_axion_data_taking()
+
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
@@ -85,4 +88,9 @@ try:
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
+    data_logger.start_axion_data_taking()
 
+data_logger.turn_off_all_switches()
+
+# send alert saying that you are stopping axion data taking.
+data_logger.stop_axion_data_taking()
