@@ -295,6 +295,15 @@ class DataLogger:
     def stop_modemap(self):
         self.cmd_interface.set('modemap_measurement_status', 'stop_measurement')
 
+    def start_axion_data_taking(self, modemap_notes = ''):
+        # TODO throw error if notes isn't a string.
+        self.cmd_interface.set('axion_data_taking_status', 'start_measurement')
+        # TODO write if statement
+        self.cmd_interface.set('axion_data_taking_status_explanation', modemap_notes)
+
+    def stop_axion_data_taking(self):
+        self.cmd_interface.set('axion_data_taking_status', 'stop_measurement')
+
     def log_s21(self, sleep_time = 0):
         self.cmd_interface.get('na_s21_iq_data')
         time.sleep(sleep_time)
@@ -349,3 +358,8 @@ class DataLogger:
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 1)
         time.sleep(0.1)
+    def turn_off_all_switches():
+        the_interface.set('switch_ps_select_channel', 'CH1')
+        the_interface.set('switch_ps_channel_output', 0)
+        the_interface.set('switch_ps_select_channel', 'CH2')
+        the_interface.set('switch_ps_channel_output', 0)
