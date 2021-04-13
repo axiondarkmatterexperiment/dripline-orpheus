@@ -61,7 +61,7 @@ try:
         narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
 
         #log narrowscan transmission
-        data_logger.log_transmission_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
         # log reflection measurements
         data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
