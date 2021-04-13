@@ -18,7 +18,7 @@ measurement_configs:
     sec_wait_for_na_averaging: 2
     averages: 16
     narrow_scan_span_guess: 600000000
-    narrow_scan_span_focus: 10000000
+    narrow_scan_span_focus: 3000000
     averaging_time_for_fo_guess_measurement: 2
     average_enable: True
 
