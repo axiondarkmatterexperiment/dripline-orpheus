@@ -139,30 +139,40 @@ class DataLogger:
             s11_mag = np.sqrt(s11_pow)
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
-            popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
-            perr_reflection = np.sqrt(np.diag(pcov_reflection))
-            dl_logger.info('Reflection lorentzian fitted parameters')
-            dl_logger.info(popt_reflection)
-            self.cmd_interface.set('f_reflection', popt_reflection[0])
-            self.cmd_interface.set('Q_reflection', popt_reflection[1])
-            self.cmd_interface.set('dy_reflection', popt_reflection[2])
-            self.cmd_interface.set('C_reflection', popt_reflection[3])
+            try:
+                popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
+                perr_reflection = np.sqrt(np.diag(pcov_reflection))
+                dl_logger.info('Reflection lorentzian fitted parameters')
+                dl_logger.info(popt_reflection)
+                self.cmd_interface.set('f_reflection', popt_reflection[0])
+                self.cmd_interface.set('Q_reflection', popt_reflection[1])
+                self.cmd_interface.set('dy_reflection', popt_reflection[2])
+                self.cmd_interface.set('C_reflection', popt_reflection[3])
 
-            #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
-            if popt_reflection[2] >= popt_reflection[3]:
-                beta = 1
-            else:
-                # Gam_res is reflection coeffient Gamma of the resonator
-                Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
-                # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
-                Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
-                Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
-                # calculate phase of Gamma_cavity at resonant frequency by interpolating
-                # data.
-                Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
-                beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
-            dl_logger.info("Antenna coupling : {}".format(beta))
-            self.cmd_interface.set('antenna_coupling', beta)
+            
+                cavity_phase = deconvolve_phase(freq, s11_phase)
+                cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
+                phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
+
+                if popt_reflection[2] >= popt_reflection[3]:
+                    beta = 1
+                else:
+                    cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
+                    antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+
+                dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
+                self.cmd_interface.set('antenna_coupling', antenna_coupling)
+            except:
+                dl_logger.warning('Could not perform a proper fit')
+
+                self.cmd_interface.set('f_reflection', 0)
+                self.cmd_interface.set('sig_f_reflection', 0)
+                self.cmd_interface.set('Q_reflection', 0)
+                self.cmd_interface.set('sig_Q_reflection', 0)
+                self.cmd_interface.set('dy_reflection', 0)
+                self.cmd_interface.set('sig_dy_reflection', 0)
+                self.cmd_interface.set('C_reflection', 0)
+                self.cmd_interface.set('sig_C_reflection', 0)
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
 
@@ -358,6 +368,7 @@ class DataLogger:
         time.sleep(0.1)
         self.cmd_interface.set('switch_ps_channel_output', 1)
         time.sleep(0.1)
+
     def turn_off_all_switches():
         the_interface.set('switch_ps_select_channel', 'CH1')
         the_interface.set('switch_ps_channel_output', 0)
