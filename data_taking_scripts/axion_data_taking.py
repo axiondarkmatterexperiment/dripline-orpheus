@@ -33,7 +33,7 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 data_logger = DataLogger(auths_file)
 
-data_logger.initialize_na_settings_for_modemap(average_enable = 0, sweep_points = sweep_points)
+data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 
 #send alert saying you're starting axion data taking
 data_logger.start_axion_data_taking()
@@ -52,6 +52,7 @@ try:
         data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
         target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
+        print(target_fo)
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
         narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
