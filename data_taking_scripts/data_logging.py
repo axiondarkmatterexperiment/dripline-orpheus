@@ -380,3 +380,9 @@ class DataLogger:
         self.the_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
+
+    def initialize_lo(self, lo_power):
+        dl_logger.info('Turning on local oscillator.')
+        self.cmd_interface.set('lo_power', lo_power)
+        self.cmd_interface.set('lo_output_status', 'on')
+

@@ -7,6 +7,7 @@ general_configs:
   digitization_time: 30
   vna_power: -5
   if_center: 30000000
+  lo_power: 16
 
 measurement_configs:
   empty_resonator:

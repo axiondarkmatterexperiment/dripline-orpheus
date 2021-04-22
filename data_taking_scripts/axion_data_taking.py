@@ -7,6 +7,7 @@ from dripline.core import Interface
 import logging
 logging.basicConfig(level=logging.INFO)
 dl_logger = logging.getLogger(__name__)
+import time
 
 def cm_to_inch(dist):
     return dist/2.54
@@ -34,6 +35,7 @@ orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 data_logger = DataLogger(auths_file)
 
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
+data_logger.initialize_lo(lo_power)
 
 #send alert saying you're starting axion data taking
 data_logger.start_axion_data_taking()
@@ -48,11 +50,13 @@ try:
     delta_length = 0
     print('Resonator length: {}'.format(current_resonator_length_cm))
     while delta_length < abs(distance_to_move):
-#take transmission measurement
+        start_t1 = time.time()
+        if the_interface.get('axion_data_taking_status').payload.to_python() == 'stop_measurement':
+            break
+        #take transmission measurement
         data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
         target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
-        print(target_fo)
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
         narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
@@ -69,7 +73,9 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
+        stop_t1 = time.time()
         data_logger.digitize(measured_fo, if_center, digitization_time)
+        start_t2 = time.time()
 
         #adjust target fo
         the_interface.set('target_fo', measured_fo)
@@ -85,6 +91,9 @@ try:
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
+        stop_t2 = time.time()
+        deadtime = (stop_t1-start_t1) + (stop_t2-start_t2)
+        the_interface.set('non_digitization_time', deadtime)
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
