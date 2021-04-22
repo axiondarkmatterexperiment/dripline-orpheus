@@ -373,10 +373,10 @@ class DataLogger:
 
     def turn_off_all_switches(self):
         dl_logger.info('Turning off all switches.')
-        self.the_interface.set('switch_ps_select_channel', 'CH1')
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         time.sleep(0.001)
-        self.the_interface.set('switch_ps_channel_output', 0)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
         time.sleep(0.001)
         self.the_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
-        self.the_interface.set('switch_ps_channel_output', 0)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
