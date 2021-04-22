@@ -28,7 +28,7 @@ class DataLogger:
     def set_stop_freq(self,stop_freq):
         self.cmd_interface.set('na_stop_freq', stop_freq)
 
-    def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, average_enable = 1, sweep_points = 2000):
+    def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, average_enable = 1, sweep_points = 2000, ifbw = 50e3):
         self.cmd_interface.set('na_start_freq', start_freq)
         self.cmd_interface.set('na_stop_freq', stop_freq)
         self.cmd_interface.set('na_power', power)
@@ -36,6 +36,7 @@ class DataLogger:
         if average_enable == 1:
             self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
+        self.cmd_interface.set('na_if_band', ifbw)
 
     def guess_resonant_frequency(self, start_freq, stop_freq, averaging_time = 2):
         self.cmd_interface.set('na_start_freq', start_freq)
@@ -290,6 +291,7 @@ class DataLogger:
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
+            dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
         self.enable_all_motors()
