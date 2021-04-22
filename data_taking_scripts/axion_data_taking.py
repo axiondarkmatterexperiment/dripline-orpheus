@@ -51,7 +51,7 @@ try:
     print('Resonator length: {}'.format(current_resonator_length_cm))
     while delta_length < abs(distance_to_move):
         start_t1 = time.time()
-        if the_interface.get('axion_data_taking_status').payload.to_python() == 'stop_measurement':
+        if the_interface.get('axion_data_taking_status').payload.to_python()['value_cal'] == 'stop_measurement':
             break
         #take transmission measurement
         data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
