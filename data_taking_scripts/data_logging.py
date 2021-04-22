@@ -377,7 +377,7 @@ class DataLogger:
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
         time.sleep(0.001)
-        self.the_interface.set('switch_ps_select_channel', 'CH2')
+        self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
 
