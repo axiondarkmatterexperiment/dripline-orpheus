@@ -275,16 +275,19 @@ class DataLogger:
         self.cmd_interface.set('curved_mirror_status_command', 'motor_disable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_disable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_disable')
+        time.sleep(0.5)
 
     def enable_all_motors(self):
         self.cmd_interface.set('curved_mirror_status_command', 'motor_enable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_enable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
+        time.sleep(0.5)
 
     def digitize(self, resonant_frequency, if_center, digitization_time):
         dl_logger.info('Now digitizing')
         self.switch_digitization_path()
-        self.disable_all_motors()
+        #I will go back to disabling, re-enabling motors if I see any suspicious RFI.
+        #self.disable_all_motors()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
@@ -294,7 +297,7 @@ class DataLogger:
             dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
-        self.enable_all_motors()
+        #self.enable_all_motors()
         dl_logger.info('Done digitizing')
 
 
