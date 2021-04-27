@@ -8,6 +8,7 @@ general_configs:
   vna_power: -5
   if_center: 30000000
   lo_power: 16
+  widescan_interval: 10
 
 measurement_configs:
   empty_resonator:
