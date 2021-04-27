@@ -354,7 +354,6 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.001)
 
     def switch_transmission_path(self):
         dl_logger.info('Switching to transmission path')
@@ -369,10 +368,13 @@ class DataLogger:
 
     def switch_digitization_path(self):
         dl_logger.info('Switching to digitization path')
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        time.sleep(0.001)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.001)
 
     def turn_off_all_switches(self):
         dl_logger.info('Turning off all switches.')
