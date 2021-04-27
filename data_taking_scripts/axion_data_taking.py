@@ -46,6 +46,17 @@ current_plate_separation = orpheus_motors.plate_separation(current_resonator_len
 
 the_interface.set('target_fo', starting_fo)
 
+#find initial VNA window for narrowscan measurements
+target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
+#get frequency span for narrowscan
+narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
+narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
+resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
+the_interface.set('target_fo', resonant_freq_guess)
+target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
+
+
+i = 0
 try:
     delta_length = 0
     print('Resonator length: {}'.format(current_resonator_length_cm))
@@ -54,21 +65,17 @@ try:
         if the_interface.get('axion_data_taking_status').payload.to_python()['value_cal'] == 'stop_measurement':
             break
         #take transmission measurement
-        data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
-
-        target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
-        #get frequency span for narrowscan
-        narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
-        narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
-        resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
-        narrow_scan_start_freq_focus = resonant_freq_guess-narrow_scan_span_focus/2
-        narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
+        if not (i%widescan_interval):
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
         #log narrowscan transmission
+        narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
+        narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
         # log reflection measurements
-        data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
+        if not (i%widescan_interval):
+            data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
         data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
         #take axion data
@@ -91,6 +98,7 @@ try:
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
+        i += 1
         stop_t2 = time.time()
         deadtime = (stop_t1-start_t1) + (stop_t2-start_t2)
         the_interface.set('non_digitization_time', deadtime)
