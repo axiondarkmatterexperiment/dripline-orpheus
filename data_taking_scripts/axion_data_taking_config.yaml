@@ -15,12 +15,12 @@ measurement_configs:
     initial_mirror_holder_spacing: 15.6 # cm
     starting_fo: 17448000000 # expected TEM_00-18 mode at initial spacing.
     sweep_points: 1000
-    increment_distance: 0.0001 #in.
+    increment_distance: 0.0002 #in.
     distance_to_move: 2 # cm
-    sec_wait_for_na_averaging: 2
+    sec_wait_for_na_averaging: 1
     averages: 16
     narrow_scan_span_guess: 600000000
     narrow_scan_span_focus: 3000000
-    averaging_time_for_fo_guess_measurement: 2
+    averaging_time_for_fo_guess_measurement: 1
     average_enable: True
 
