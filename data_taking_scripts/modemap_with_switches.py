@@ -96,14 +96,11 @@ try:
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
         current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
+    data_logger.stop_modemap()
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
     orpheus_motors.stop_and_kill()
     #data_logger.stop_modemap()
 
-the_interface.set('switch_ps_select_channel', 'CH1')
-the_interface.set('switch_ps_channel_output', 0)
-the_interface.set('switch_ps_select_channel', 'CH2')
-the_interface.set('switch_ps_channel_output', 0)
-data_logger.stop_modemap()
+data_logger.turn_off_all_switches()

@@ -28,7 +28,7 @@ class DataLogger:
     def set_stop_freq(self,stop_freq):
         self.cmd_interface.set('na_stop_freq', stop_freq)
 
-    def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, average_enable = 1, sweep_points = 2000):
+    def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, average_enable = 1, sweep_points = 2000, ifbw = 50e3):
         self.cmd_interface.set('na_start_freq', start_freq)
         self.cmd_interface.set('na_stop_freq', stop_freq)
         self.cmd_interface.set('na_power', power)
@@ -36,6 +36,7 @@ class DataLogger:
         if average_enable == 1:
             self.cmd_interface.set('na_averages', averages)
         self.cmd_interface.set('na_sweep_points', sweep_points)
+        self.cmd_interface.set('na_if_band', ifbw)
 
     def guess_resonant_frequency(self, start_freq, stop_freq, averaging_time = 2):
         self.cmd_interface.set('na_start_freq', start_freq)
@@ -139,30 +140,40 @@ class DataLogger:
             s11_mag = np.sqrt(s11_pow)
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
-            popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
-            perr_reflection = np.sqrt(np.diag(pcov_reflection))
-            dl_logger.info('Reflection lorentzian fitted parameters')
-            dl_logger.info(popt_reflection)
-            self.cmd_interface.set('f_reflection', popt_reflection[0])
-            self.cmd_interface.set('Q_reflection', popt_reflection[1])
-            self.cmd_interface.set('dy_reflection', popt_reflection[2])
-            self.cmd_interface.set('C_reflection', popt_reflection[3])
+            try:
+                popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
+                perr_reflection = np.sqrt(np.diag(pcov_reflection))
+                dl_logger.info('Reflection lorentzian fitted parameters')
+                dl_logger.info(popt_reflection)
+                self.cmd_interface.set('f_reflection', popt_reflection[0])
+                self.cmd_interface.set('Q_reflection', popt_reflection[1])
+                self.cmd_interface.set('dy_reflection', popt_reflection[2])
+                self.cmd_interface.set('C_reflection', popt_reflection[3])
 
-            #TODO figure out how to deal with this weird edge case later. This doesn't seem physical
-            if popt_reflection[2] >= popt_reflection[3]:
-                beta = 1
-            else:
-                # Gam_res is reflection coeffient Gamma of the resonator
-                Gam_res_mag, Gam_res_phase = reflection_deconvolve_line(freq, s11_mag, s11_phase, popt_reflection[3])
-                # Calculates magnitude of Gamma_cavity by plugging resonant frequency into fitted function
-                Gam_res_mag_fo = np.sqrt(func_pow_reflected(popt_reflection[0], *popt_reflection)*1/popt_reflection[3])
-                Gam_res_interp_phase = interp1d(freq, Gam_res_phase, kind='cubic')
-                # calculate phase of Gamma_cavity at resonant frequency by interpolating
-                # data.
-                Gam_res_phase_fo = Gam_res_interp_phase(popt_reflection[0])
-                beta = calculate_coupling(Gam_res_mag_fo, Gam_res_phase_fo)
-            dl_logger.info("Antenna coupling : {}".format(beta))
-            self.cmd_interface.set('antenna_coupling', beta)
+            
+                cavity_phase = deconvolve_phase(freq, s11_phase)
+                cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
+                phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
+
+                if popt_reflection[2] >= popt_reflection[3]:
+                    beta = 1
+                else:
+                    cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
+                    antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+
+                dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
+                self.cmd_interface.set('antenna_coupling', antenna_coupling)
+            except:
+                dl_logger.warning('Could not perform a proper fit')
+
+                self.cmd_interface.set('f_reflection', 0)
+                self.cmd_interface.set('sig_f_reflection', 0)
+                self.cmd_interface.set('Q_reflection', 0)
+                self.cmd_interface.set('sig_Q_reflection', 0)
+                self.cmd_interface.set('dy_reflection', 0)
+                self.cmd_interface.set('sig_dy_reflection', 0)
+                self.cmd_interface.set('C_reflection', 0)
+                self.cmd_interface.set('sig_C_reflection', 0)
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
 
@@ -264,25 +275,29 @@ class DataLogger:
         self.cmd_interface.set('curved_mirror_status_command', 'motor_disable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_disable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_disable')
+        time.sleep(0.5)
 
     def enable_all_motors(self):
         self.cmd_interface.set('curved_mirror_status_command', 'motor_enable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_enable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
+        time.sleep(0.5)
 
     def digitize(self, resonant_frequency, if_center, digitization_time):
         dl_logger.info('Now digitizing')
         self.switch_digitization_path()
-        self.disable_all_motors()
+        #I will go back to disabling, re-enabling motors if I see any suspicious RFI.
+        #self.disable_all_motors()
         self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
+            dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(1)
-        self.enable_all_motors()
+        #self.enable_all_motors()
         dl_logger.info('Done digitizing')
 
 
@@ -294,6 +309,15 @@ class DataLogger:
 
     def stop_modemap(self):
         self.cmd_interface.set('modemap_measurement_status', 'stop_measurement')
+
+    def start_axion_data_taking(self, modemap_notes = ''):
+        # TODO throw error if notes isn't a string.
+        self.cmd_interface.set('axion_data_taking_status', 'start_measurement')
+        # TODO write if statement
+        self.cmd_interface.set('axion_data_taking_status_explanation', modemap_notes)
+
+    def stop_axion_data_taking(self):
+        self.cmd_interface.set('axion_data_taking_status', 'stop_measurement')
 
     def log_s21(self, sleep_time = 0):
         self.cmd_interface.get('na_s21_iq_data')
@@ -324,28 +348,44 @@ class DataLogger:
     def switch_reflection_path(self):
         dl_logger.info('Switching to reflection path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.1)
+        time.sleep(0.001)
 
     def switch_transmission_path(self):
         dl_logger.info('Switching to transmission path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 0)
-        time.sleep(0.1)
+        time.sleep(0.001)
 
     def switch_digitization_path(self):
         dl_logger.info('Switching to digitization path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.1)
+        time.sleep(0.001)
+
+    def turn_off_all_switches(self):
+        dl_logger.info('Turning off all switches.')
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        time.sleep(0.001)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.001)
+        self.cmd_interface.set('switch_ps_select_channel', 'CH2')
+        time.sleep(0.001)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+
+    def initialize_lo(self, lo_power):
+        dl_logger.info('Turning on local oscillator.')
+        self.cmd_interface.set('lo_power', lo_power)
+        self.cmd_interface.set('lo_output_status', 'on')
+
