@@ -78,7 +78,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
 	#  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         if autoscale:
@@ -96,7 +96,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
         self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
         time.sleep(sec_wait_for_na_averaging)
@@ -128,7 +128,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
         self.switch_reflection_path()
         self.cmd_interface.get('s21_iq_reflection_data')
         time.sleep(sec_wait_for_na_averaging)
@@ -186,7 +186,7 @@ class DataLogger:
         self.cmd_interface.set('na_measurement_status', 'start_measurement')
         self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('modemap_snapshot_no_iq', 'log_entities')
+        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
         # get transmission data
         self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
@@ -354,7 +354,6 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.001)
 
     def switch_transmission_path(self):
         dl_logger.info('Switching to transmission path')
@@ -369,10 +368,13 @@ class DataLogger:
 
     def switch_digitization_path(self):
         dl_logger.info('Switching to digitization path')
+        self.cmd_interface.set('switch_ps_select_channel', 'CH1')
+        time.sleep(0.001)
+        self.cmd_interface.set('switch_ps_channel_output', 0)
+        time.sleep(0.001)
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
         self.cmd_interface.set('switch_ps_channel_output', 1)
-        time.sleep(0.001)
 
     def turn_off_all_switches(self):
         dl_logger.info('Turning off all switches.')
