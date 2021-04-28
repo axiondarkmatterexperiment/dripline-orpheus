@@ -71,9 +71,16 @@ try:
         if not (i%widescan_interval):
             data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
-        #log narrowscan transmission
-        resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, averaging_time = averaging_time_for_fo_guess_measurement/4)
+        #get frequency span for narrowscan
+        narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
+        narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
+        resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement/2)
+        narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
+        narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
         the_interface.set('target_fo', resonant_freq_guess)
+        target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
+
+
         narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
