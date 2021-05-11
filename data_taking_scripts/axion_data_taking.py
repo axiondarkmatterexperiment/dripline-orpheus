@@ -37,8 +37,11 @@ data_logger = DataLogger(auths_file)
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 data_logger.initialize_lo(lo_power)
 
+#  Ask user to describe the measurement. Forces user to document what they are doing.
+measurement_description = input('Describe the current measurement setup: ')
+
 #send alert saying you're starting axion data taking
-data_logger.start_axion_data_taking()
+data_logger.start_axion_data_taking(measurement_description)
 
 current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
@@ -83,11 +86,10 @@ try:
 
         narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
+
+        the_interface.set('axion_record_spectrum_status', 'start_measurement')
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
-        # log reflection measurements
-        if not (i%widescan_interval):
-            data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
         data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
         #take axion data
@@ -95,6 +97,11 @@ try:
         stop_t1 = time.time()
         data_logger.digitize(measured_fo, if_center, digitization_time)
         start_t2 = time.time()
+        self.cmd_interface.set('axion_record_spectrum_status', 'stop_measurement')
+
+        # log reflection measurements
+        if not (i%widescan_interval):
+            data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
         #adjust target fo
         the_interface.set('target_fo', measured_fo)

@@ -13,7 +13,7 @@ general_configs:
 measurement_configs:
   empty_resonator:
     initial_mirror_holder_spacing: 15.6 # cm
-    starting_fo: 17448000000 # expected TEM_00-18 mode at initial spacing.
+    starting_fo: 17480000000 # expected TEM_00-18 mode at initial spacing.
     sweep_points: 1000
     increment_distance: 0.0002 #in.
     distance_to_move: 2 # cm
