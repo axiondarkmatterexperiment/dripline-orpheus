@@ -1,5 +1,6 @@
 from data_logging import DataLogger
 from dripline.core import Interface
+import numpy as np
 
 #setting up connection to dripline
 auths_file = '/etc/rabbitmq-secret/authentications.json'
@@ -14,6 +15,3 @@ noise_floor_voltage = the_interface.get('s21_iq_transmission_data').payload.to_p
 the_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
 
 print(np.std(noise_floor_voltage))
-
-
-
