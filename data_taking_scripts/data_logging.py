@@ -125,10 +125,7 @@ class DataLogger:
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
-        self.cmd_interface.set('na_measurement_status', 'start_measurement')
-        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
+
         self.switch_reflection_path()
         self.cmd_interface.get('s21_iq_reflection_data')
         time.sleep(sec_wait_for_na_averaging)
@@ -310,11 +307,11 @@ class DataLogger:
     def stop_modemap(self):
         self.cmd_interface.set('modemap_measurement_status', 'stop_measurement')
 
-    def start_axion_data_taking(self, modemap_notes = ''):
+    def start_axion_data_taking(self, axion_data_taking_notes = ''):
         # TODO throw error if notes isn't a string.
         self.cmd_interface.set('axion_data_taking_status', 'start_measurement')
         # TODO write if statement
-        self.cmd_interface.set('axion_data_taking_status_explanation', modemap_notes)
+        self.cmd_interface.set('axion_data_taking_status_explanation', axion_data_taking_notes)
 
     def stop_axion_data_taking(self):
         self.cmd_interface.set('axion_data_taking_status', 'stop_measurement')
