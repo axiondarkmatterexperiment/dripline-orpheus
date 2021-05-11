@@ -99,7 +99,7 @@ try:
         stop_t1 = time.time()
         data_logger.digitize(measured_fo, if_center, digitization_time)
         start_t2 = time.time()
-        self.cmd_interface.set('axion_record_spectrum_status', 'stop_measurement')
+        the_interface.set('axion_record_spectrum_status', 'stop_measurement')
 
         # log reflection measurements
         if not (i%widescan_interval):
