@@ -88,15 +88,11 @@ class DataLogger:
         dl_logger.info('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, autoscale = False, fitting = False):
         dl_logger.info('Measuring transmission with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
-        self.cmd_interface.set('na_measurement_status', 'start_measurement')
-        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
-        dl_logger.info('Logging list of endpoints')
-        self.cmd_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
         self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
         time.sleep(sec_wait_for_na_averaging)
@@ -120,7 +116,7 @@ class DataLogger:
             self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
+    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, autoscale = False, fitting = False):
         dl_logger.info('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)

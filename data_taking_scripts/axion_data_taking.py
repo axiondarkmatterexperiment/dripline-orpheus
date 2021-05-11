@@ -72,6 +72,8 @@ try:
             break
         #take transmission measurement
         if not (i%widescan_interval):
+            the_interface.set('na_measurement_status', 'start_measurement')
+            the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
             data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
 
         #get frequency span for narrowscan
@@ -88,9 +90,9 @@ try:
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
 
         the_interface.set('axion_record_spectrum_status', 'start_measurement')
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, fitting = True)
 
-        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
+        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, fitting = True)
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
@@ -102,6 +104,7 @@ try:
         # log reflection measurements
         if not (i%widescan_interval):
             data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
+            the_interface.set('na_measurement_status', 'stop_measurement')
 
         #adjust target fo
         the_interface.set('target_fo', measured_fo)
