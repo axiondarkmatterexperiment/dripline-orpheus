@@ -87,7 +87,7 @@ try:
         narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
 
-        self.cmd_interface.set('axion_record_spectrum_status', 'start_measurement')
+        the_interface.set('axion_record_spectrum_status', 'start_measurement')
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
 
         data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'axion data taking. narrowscan', fitting = True)
