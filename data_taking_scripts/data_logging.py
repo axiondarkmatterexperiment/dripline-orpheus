@@ -94,6 +94,7 @@ class DataLogger:
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
         self.switch_transmission_path()
+        log_switch_settings()
         self.cmd_interface.get('s21_iq_transmission_data')
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
@@ -116,15 +117,16 @@ class DataLogger:
             self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, autoscale = False, fitting = False):
+    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, autoscale = False, fitting = False):
         dl_logger.info('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
 
         self.switch_reflection_path()
+        log_switch_settings()
         self.cmd_interface.get('s21_iq_reflection_data')
-        time.sleep(sec_wait_for_na_averaging)
+        time.sleep(sec_wait_for_na_reflection_averaging)
         self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
         if fitting:
             s11_iq = self.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
@@ -383,4 +385,9 @@ class DataLogger:
         dl_logger.info('Turning on local oscillator.')
         self.cmd_interface.set('lo_power', lo_power)
         self.cmd_interface.set('lo_output_status', 'on')
+
+    def log_switch_settings(self):
+        dl_logger.info('Recording switch settings')
+        self.cmd_interface.cmd('switch_ps_select_channel', 'scheduled_log')
+        self.cmd_interface.cmd('switch_ps_channel_output', 'scheduled_log')
 
