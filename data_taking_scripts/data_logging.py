@@ -94,7 +94,7 @@ class DataLogger:
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
         self.switch_transmission_path()
-        log_switch_settings()
+        self.log_switch_settings()
         self.cmd_interface.get('s21_iq_transmission_data')
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
@@ -124,7 +124,7 @@ class DataLogger:
         dl_logger.info('Setting na_measurement_status to start_measurement')
 
         self.switch_reflection_path()
-        log_switch_settings()
+        self.log_switch_settings()
         self.cmd_interface.get('s21_iq_reflection_data')
         time.sleep(sec_wait_for_na_reflection_averaging)
         self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')

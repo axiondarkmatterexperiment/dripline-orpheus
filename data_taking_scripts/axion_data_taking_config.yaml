@@ -15,7 +15,7 @@ measurement_configs:
     initial_mirror_holder_spacing: 15.6 # cm
     starting_fo: 17480000000 # expected TEM_00-18 mode at initial spacing.
     sweep_points: 1000
-    increment_distance: 0.0002 #in.
+    increment_distance: 0.0001 #in.
     distance_to_move: 2 # cm
     sec_wait_for_na_transmission_averaging: 1
     sec_wait_for_na_reflection_averaging: 2
