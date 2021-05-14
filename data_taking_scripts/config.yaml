@@ -32,7 +32,8 @@ measurement_configs:
     average_enable: 1 # 1 or 0
     averages: 16 # value doesn't matter is averable_enable = 0
     narrow_scan: True
-    narrow_scan_span: 50000000
+    narrow_scan_span_guess: 600000000
+    narrow_scan_span_focus: 10000000
     ifile_predicted_resonances: 'dielectric_aperture_on_curved_mirror_measured.csv'
     sweep_points: 1000
     distance_to_move: 3
