@@ -1,7 +1,7 @@
 general_configs:
   num_plates: 4
-    #motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
-  motors_to_move: ['curved_mirror']
+  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+    #motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
   if_center: 30000000
@@ -37,6 +37,8 @@ measurement_configs:
     sweep_points: 1000
     distance_to_move: 3
     number_of_measurement_points: 50
+    digitize: false
+    averaging_time_for_fo_guess_measurement: 2
 
   ln2_empty_modemap:
     initial_mirror_holder_spacing: 13 #length in cm

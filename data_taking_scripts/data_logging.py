@@ -29,9 +29,6 @@ class DataLogger:
         self.cmd_interface.set('na_stop_freq', stop_freq)
 
     def initialize_na_settings_for_modemap(self,start_freq = 15e9, stop_freq = 18e9, power = (-5) , averages = 0, average_enable = 1, sweep_points = 2000, ifbw = 50e3):
-        if average_enable not 1 or average_enable not 0:
-            dl_logger.warning('average_enable must be 1 or 0')
-            sys.exit()
         
         self.cmd_interface.set('na_power', power)
         self.cmd_interface.set('na_start_freq', start_freq)
@@ -47,6 +44,7 @@ class DataLogger:
         self.cmd_interface.set('na_stop_freq', stop_freq)
         self.switch_transmission_path()
         s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
+        self.cmd_interface.set('na_commands', 'clear_averages')
         time.sleep(averaging_time)
         s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
         s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])

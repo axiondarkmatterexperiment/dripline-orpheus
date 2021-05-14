@@ -19,7 +19,6 @@ class Motor:
             Status R represents that the motor is not moving and
             ready to accept commands. '''
         command = F"{self.name}_motor_request_status"
-        print(self.cmd_interface.get(command).payload.to_python())
         status = self.cmd_interface.get(command).payload.to_python()['value_raw']
         return status
 
