@@ -96,6 +96,7 @@ class DataLogger:
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
         self.switch_transmission_path()
+        self.cmd_interface.set('na_commands', 'clear_averages')
         self.log_switch_settings()
         self.cmd_interface.get('s21_iq_transmission_data')
         time.sleep(sec_wait_for_na_averaging)
@@ -128,6 +129,7 @@ class DataLogger:
         self.switch_reflection_path()
         self.log_switch_settings()
         self.cmd_interface.get('s21_iq_reflection_data')
+        self.cmd_interface.set('na_commands', 'clear_averages')
         time.sleep(sec_wait_for_na_reflection_averaging)
         self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
         if fitting:
@@ -187,6 +189,7 @@ class DataLogger:
         # get transmission data
         self.switch_transmission_path()
         self.cmd_interface.get('s21_iq_transmission_data')
+        self.cmd_interface.set('na_commands', 'clear_averages')
 	    #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         if autoscale:
@@ -215,6 +218,7 @@ class DataLogger:
         # get reflection data
         self.switch_reflection_path()
         self.cmd_interface.get('s21_iq_reflection_data')
+        self.cmd_interface.set('na_commands', 'clear_averages')
 	    #  wait for network analyzer to finish several sweeps for averaging
         time.sleep(sec_wait_for_na_averaging)
         if autoscale:
