@@ -23,5 +23,5 @@ measurement_configs:
     narrow_scan_span_guess: 600000000
     narrow_scan_span_focus: 3000000
     averaging_time_for_fo_guess_measurement: 1
-    average_enable: True
+    average_enable: 1 #must be 1 or 0
 
