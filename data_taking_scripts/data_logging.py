@@ -284,8 +284,10 @@ class DataLogger:
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
         time.sleep(0.5)
 
-    def digitize(self, resonant_frequency, if_center, digitization_time):
+    def digitize(self, resonant_frequency, if_center, digitization_time, vna_output_enable = 0):
+        ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
         dl_logger.info('Now digitizing')
+        self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0.
         self.switch_digitization_path()
         #I will go back to disabling, re-enabling motors if I see any suspicious RFI.
         #self.disable_all_motors()
@@ -300,6 +302,7 @@ class DataLogger:
             time.sleep(1)
         #self.enable_all_motors()
         dl_logger.info('Done digitizing')
+        self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1
 
 
     def start_modemap(self, modemap_notes = ''):
