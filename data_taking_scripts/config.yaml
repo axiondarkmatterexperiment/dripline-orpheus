@@ -39,9 +39,10 @@ measurement_configs:
     distance_to_move: 3
     number_of_measurement_points: 50
     digitize: false
+    zoom_using_data: false
     averaging_time_for_fo_guess_measurement: 2
     fitting: true
-    tem0018_offset: -21000000
+    tem0018_offset: 0
 
   ln2_empty_modemap:
     initial_mirror_holder_spacing: 13 #length in cm
