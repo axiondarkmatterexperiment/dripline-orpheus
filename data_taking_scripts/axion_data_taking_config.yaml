@@ -31,8 +31,8 @@ measurement_configs:
     sweep_points: 512
     increment_distance: 0.0001 #in.
     distance_to_move: 2 # cm
-    sec_wait_for_na_transmission_averaging: 2
-    sec_wait_for_na_reflection_averaging: 3
+    sec_wait_for_na_transmission_averaging: 1.5
+    sec_wait_for_na_reflection_averaging: 1.5
     averages: 16
     narrow_scan_span_guess: 600000000
     narrow_scan_span_focus: 20000000
