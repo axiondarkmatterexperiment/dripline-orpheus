@@ -106,18 +106,24 @@ class DataLogger:
             s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
-            popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
-            perr_transmission = np.sqrt(np.diag(pcov_transmission))
-            dl_logger.info('Transmission lorentzian fitted parameters')
-            dl_logger.info(popt_transmission)
-            self.cmd_interface.set('f_transmission', popt_transmission[0])
-            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
-            self.cmd_interface.set('Q_transmission', popt_transmission[1])
-            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
-            self.cmd_interface.set('dy_transmission', popt_transmission[2])
-            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
-            self.cmd_interface.set('C_transmission', popt_transmission[3])
-            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
+            try:
+                popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
+                perr_transmission = np.sqrt(np.diag(pcov_transmission))
+                dl_logger.info('Transmission lorentzian fitted parameters')
+                dl_logger.info(popt_transmission)
+
+                self.cmd_interface.set('f_transmission', popt_transmission[0])
+                self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
+                self.cmd_interface.set('Q_transmission', popt_transmission[1])
+                self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
+                self.cmd_interface.set('dy_transmission', popt_transmission[2])
+                self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
+                self.cmd_interface.set('C_transmission', popt_transmission[3])
+                self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
+            except:
+                dl_logger.warning('Could not perform a proper fit')
+                self.stop_axion_data_taking()
+                sys.exit()
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, autoscale = False, fitting = False):
@@ -163,16 +169,10 @@ class DataLogger:
                 dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
                 self.cmd_interface.set('antenna_coupling', antenna_coupling)
             except:
+                self.stop_axion_data_taking()
                 dl_logger.warning('Could not perform a proper fit')
+                sys.exit()
 
-                self.cmd_interface.set('f_reflection', 0)
-                self.cmd_interface.set('sig_f_reflection', 0)
-                self.cmd_interface.set('Q_reflection', 0)
-                self.cmd_interface.set('sig_Q_reflection', 0)
-                self.cmd_interface.set('dy_reflection', 0)
-                self.cmd_interface.set('sig_dy_reflection', 0)
-                self.cmd_interface.set('C_reflection', 0)
-                self.cmd_interface.set('sig_C_reflection', 0)
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
 
@@ -200,19 +200,23 @@ class DataLogger:
             s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
-            popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
-            perr_transmission = np.sqrt(np.diag(pcov_transmission))
-            dl_logger.info('Transmission lorentzian fitted parameters')
-            dl_logger.info(popt_transmission)
-            dl_logger.info(perr_transmission)
-            self.cmd_interface.set('f_transmission', popt_transmission[0])
-            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
-            self.cmd_interface.set('Q_transmission', np.abs(popt_transmission[1]))
-            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
-            self.cmd_interface.set('dy_transmission', popt_transmission[2])
-            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
-            self.cmd_interface.set('C_transmission', popt_transmission[3])
-            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
+            try:
+                popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
+                perr_transmission = np.sqrt(np.diag(pcov_transmission))
+                dl_logger.info('Transmission lorentzian fitted parameters')
+                dl_logger.info(popt_transmission)
+                dl_logger.info(perr_transmission)
+                self.cmd_interface.set('f_transmission', popt_transmission[0])
+                self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
+                self.cmd_interface.set('Q_transmission', np.abs(popt_transmission[1]))
+                self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
+                self.cmd_interface.set('dy_transmission', popt_transmission[2])
+                self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
+                self.cmd_interface.set('C_transmission', popt_transmission[3])
+                self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
+            except:
+                dl_logger.warning('Could not perform a proper fit')
+                sys.exit()
 
 
         # get reflection data
