@@ -108,22 +108,21 @@ class DataLogger:
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
             try:
                 popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
-                perr_transmission = np.sqrt(np.diag(pcov_transmission))
-                dl_logger.info('Transmission lorentzian fitted parameters')
-                dl_logger.info(popt_transmission)
-
-                self.cmd_interface.set('f_transmission', popt_transmission[0])
-                self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
-                self.cmd_interface.set('Q_transmission', popt_transmission[1])
-                self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
-                self.cmd_interface.set('dy_transmission', popt_transmission[2])
-                self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
-                self.cmd_interface.set('C_transmission', popt_transmission[3])
-                self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
             except:
-                dl_logger.warning('Could not perform a proper fit')
                 self.stop_axion_data_taking()
                 sys.exit()
+            perr_transmission = np.sqrt(np.diag(pcov_transmission))
+            dl_logger.info('Transmission lorentzian fitted parameters')
+            dl_logger.info(popt_transmission)
+
+            self.cmd_interface.set('f_transmission', popt_transmission[0])
+            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
+            self.cmd_interface.set('Q_transmission', popt_transmission[1])
+            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
+            self.cmd_interface.set('dy_transmission', popt_transmission[2])
+            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
+            self.cmd_interface.set('C_transmission', popt_transmission[3])
+            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, autoscale = False, fitting = False):
@@ -147,31 +146,31 @@ class DataLogger:
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
             try:
                 popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
-                perr_reflection = np.sqrt(np.diag(pcov_reflection))
-                dl_logger.info('Reflection lorentzian fitted parameters')
-                dl_logger.info(popt_reflection)
-                self.cmd_interface.set('f_reflection', popt_reflection[0])
-                self.cmd_interface.set('Q_reflection', popt_reflection[1])
-                self.cmd_interface.set('dy_reflection', popt_reflection[2])
-                self.cmd_interface.set('C_reflection', popt_reflection[3])
-
-            
-                cavity_phase = deconvolve_phase(freq, s11_phase)
-                cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
-                phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
-
-                if popt_reflection[2] >= popt_reflection[3]:
-                    beta = 1
-                else:
-                    cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
-                    antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
-
-                dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
-                self.cmd_interface.set('antenna_coupling', antenna_coupling)
             except:
                 self.stop_axion_data_taking()
                 dl_logger.warning('Could not perform a proper fit')
                 sys.exit()
+            perr_reflection = np.sqrt(np.diag(pcov_reflection))
+            dl_logger.info('Reflection lorentzian fitted parameters')
+            dl_logger.info(popt_reflection)
+            self.cmd_interface.set('f_reflection', popt_reflection[0])
+            self.cmd_interface.set('Q_reflection', popt_reflection[1])
+            self.cmd_interface.set('dy_reflection', popt_reflection[2])
+            self.cmd_interface.set('C_reflection', popt_reflection[3])
+
+            
+            cavity_phase = deconvolve_phase(freq, s11_phase)
+            cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
+            phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
+
+            if popt_reflection[2] >= popt_reflection[3]:
+                beta = 1
+            else:
+                cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
+                antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+
+            dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
+            self.cmd_interface.set('antenna_coupling', antenna_coupling)
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
