@@ -76,10 +76,11 @@ try:
             resonant_freq = func_res_freq_interp(current_resonator_length_cm) + tem0018_offset
             narrow_scan_start_freq = resonant_freq - narrow_scan_span_guess/2
             narrow_scan_stop_freq = resonant_freq + narrow_scan_span_guess/2
-            resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
-            narrow_scan_start_freq_focus = resonant_freq_guess-narrow_scan_span_focus/2
-            narrow_scan_stop_freq_focus = resonant_freq_guess+narrow_scan_span_focus/2
-            data_logger.log_transmission_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
+            if zoom_using_data:
+                resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement)
+                narrow_scan_start_freq = resonant_freq_guess-narrow_scan_span_focus/2
+                narrow_scan_stop_freq = resonant_freq_guess+narrow_scan_span_focus/2
+            data_logger.log_transmission_reflection_switches(narrow_scan_start_freq, narrow_scan_stop_freq, sec_wait_for_na_averaging, 'narrowscan', fitting = fitting)
 
         if digitize:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']

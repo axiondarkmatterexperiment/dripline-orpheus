@@ -9,7 +9,7 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 
 data_logger = DataLogger(auths_file)
 
-rf_center_frequency =  16.5e9
+rf_center_frequency =  17.48e9
 if_center = 30e6
 digitization_time = 30
 

@@ -17,7 +17,7 @@ data_logger = DataLogger(auths_file)
 
 vna_power_limits = [-15, -5]
 gain = 16 #dB
-tone_frequency =  16.5e9
+tone_frequency =  17.48e9
 if_center = 30e6
 digitization_time = 30
 #target_tone_power = 28-gain #aim for 28 dBm at digitizer input. Do not exceed 34 dBm at digitizer input.

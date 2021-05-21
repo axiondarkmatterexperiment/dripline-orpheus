@@ -74,7 +74,7 @@ try:
         if not (i%widescan_interval):
             the_interface.set('na_measurement_status', 'start_measurement')
             the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
-            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan')
 
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
@@ -85,14 +85,15 @@ try:
         the_interface.set('target_fo', resonant_freq_guess)
         target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
 
-
         narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
 
         the_interface.set('axion_record_spectrum_status', 'start_measurement')
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, fitting = True)
+        the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
 
-        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_averaging, fitting = True)
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True)
+
+        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_reflection_averaging, fitting = True)
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
@@ -103,7 +104,8 @@ try:
 
         # log reflection measurements
         if not (i%widescan_interval):
-            data_logger.log_reflection_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_averaging, 'axion data taking. widescan')
+            #switch is already in the reflection position. we just need to change the frequency range. So we don't have to average as long to have the system settle down.
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan')
             the_interface.set('na_measurement_status', 'stop_measurement')
 
         #adjust target fo
