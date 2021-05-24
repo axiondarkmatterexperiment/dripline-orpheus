@@ -13,7 +13,6 @@ general_configs:
 measurement_configs:
   empty_resonator:
     initial_mirror_holder_spacing: 15.6 # cm
-    starting_fo: 17480000000 # expected TEM_00-18 mode at initial spacing.
     sweep_points: 512
     increment_distance: 0.0001 #in.
     distance_to_move: 2 # cm
@@ -27,7 +26,6 @@ measurement_configs:
 
   dielectric_resonator:
     initial_mirror_holder_spacing: 13.55 # cm total length 14.55 cm
-    starting_fo: 16949000000 # expected TEM_00-18 mode at initial spacing.
     sweep_points: 512
     increment_distance: 0.0001 #in.
     distance_to_move: 2 # cm

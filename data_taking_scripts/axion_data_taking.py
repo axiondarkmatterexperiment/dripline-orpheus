@@ -47,9 +47,8 @@ current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
-the_interface.set('target_fo', starting_fo)
-
 #find initial VNA window for narrowscan measurements
+# target_fo has to be set beforehand through dripline
 target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
 
 #get frequency span for narrowscan
