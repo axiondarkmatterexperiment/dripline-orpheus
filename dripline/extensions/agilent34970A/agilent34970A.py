@@ -12,17 +12,6 @@ class MuxerService(EthernetSCPIService):
     '''
     Provider to interface with muxer
     '''
-
-    def __init__(self, scan_interval=0,**kwargs):
-        '''
-        scan_interval (int): time between scans in seconds
-        '''
-        EthernetSCPIService.__init__(self,**kwargs)
-        if scan_interval <= 0:
-            raise ThrowReply("scan interval must be > 0")
-            #raise exceptions.DriplineValueError("scan interval must be > 0")
-        self.scan_interval = scan_interval
-
     def configure_scan(self, *args, **kwargs):
         '''
         loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
@@ -50,6 +39,18 @@ class MuxerService(EthernetSCPIService):
                    'TRIG:COUN INF;*OPC?',\
                    'TRIG:TIM {};*OPC?'.format(self.scan_interval),\
                    'INIT;*ESE?'])
+
+
+    def __init__(self, scan_interval=0,**kwargs):
+        '''
+        scan_interval (int): time between scans in seconds
+        '''
+        EthernetSCPIService.__init__(self,**kwargs)
+        if scan_interval <= 0:
+            raise ThrowReply("scan interval must be > 0")
+            #raise exceptions.DriplineValueError("scan interval must be > 0")
+        self.scan_interval = scan_interval
+        self.configure_scan()
 
 __all__.append("MuxerGetEntity")
 class MuxerGetEntity(Entity):
