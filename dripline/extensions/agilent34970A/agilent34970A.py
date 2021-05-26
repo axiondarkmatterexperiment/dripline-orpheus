@@ -16,7 +16,7 @@ class MuxerService(EthernetSCPIService):
         '''
         loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
         '''
-        self.send(['ABOR;*CLS;*OPC?'])
+        self.send_to_device('ABOR;*CLS;*OPC?')
 
         ch_scan_list = list()
         for child in self.endpoints:
