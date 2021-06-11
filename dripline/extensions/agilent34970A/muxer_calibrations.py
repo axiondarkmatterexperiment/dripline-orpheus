@@ -1,5 +1,8 @@
 import math
 import logging
+import numpy as np
+
+
 logger = logging.getLogger(__name__)
 
 __all__ = []
@@ -26,6 +29,14 @@ def piecewise_cal(values_x, values_y, this_x, log_x=False, log_y=False):
     if log_y:
         to_return = math.exp(to_return)
     return to_return
+
+def x83871_cal(resistance):
+    '''calibration for cernox'''
+    M = np.loadtxt('temperature_sensor_calibrations/x83781_calibration.txt')
+    resistance_cal = M[0,:]
+    temperature_cal = M[1,:]
+    interpolated_temperature = np.interp(resistance, resistance_cal, temperature_cal)
+    return interpolated_temperature
 
 # PT 100
 def pt100_cal(resistance):
