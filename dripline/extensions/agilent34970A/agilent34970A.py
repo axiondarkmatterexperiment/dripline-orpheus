@@ -12,6 +12,41 @@ class MuxerService(EthernetSCPIService):
     '''
     Provider to interface with muxer
     '''
+    def configure_scan(self, *args, **kwargs):
+        '''
+        loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
+        '''
+        self.send_to_device('ABOR;*CLS;*OPC?')
+
+        ch_scan_list = list()
+        logger.info(self.sync_children)
+        for child in self.sync_children:
+
+            logger.info(child)
+            if not isinstance(self.sync_children[child], MuxerGetEntity):
+                logger.info(child)
+                logger.info('help0')
+                continue
+            elif self.sync_children[child].conf_str:
+                # check if the configuration command associated with the endpoint is valid.
+                error_data = self.send(self.sync_children[child].conf_str+';*OPC?; SYST:ERR?')
+                logger.info('help')
+                if error_data != '1;+0,"No error"':
+                    logger.critical('Error detected; cannot configure muxer')
+                    raise ThrowReply('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
+                logger.info('help2')
+            ch_scan_list.append(str(self.sync_children[child].ch_number))
+            self.sync_children[child].log_interval = self.scan_interval
+
+        logger.info('help3')
+        scan_list_cmd = 'ROUT:SCAN (@{})'.format(','.join(ch_scan_list))
+        logger.info('help4')
+        self.send_to_device(scan_list_cmd+';*OPC?;'+\
+                   'TRIG:SOUR TIM;*OPC?;'+\
+                   'TRIG:COUN INF;*OPC?;'+\
+                   'TRIG:TIM {};*OPC?;'.format(self.scan_interval)+\
+                   'INIT;*ESE?;')
+
 
     def __init__(self, scan_interval=0,**kwargs):
         '''
@@ -22,34 +57,9 @@ class MuxerService(EthernetSCPIService):
             raise ThrowReply("scan interval must be > 0")
             #raise exceptions.DriplineValueError("scan interval must be > 0")
         self.scan_interval = scan_interval
-
-    def configure_scan(self, *args, **kwargs):
-        '''
-        loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
-        '''
-        self.send(['ABOR;*CLS;*OPC?'])
-
-        ch_scan_list = list()
-        for child in self.endpoints:
-
-            if not isinstance(self.endpoints[child], MuxerGetEntity):
-                continue
-            elif self.endpoints[child].conf_str:
-                # check if the configuration command associated with the endpoint is valid.
-                error_data = self.send([self.endpoints[child].conf_str+';*OPC?',\
-                                        'SYST:ERR?'])
-                if error_data != '1;+0,"No error"':
-                    logger.critical('Error detected; cannot configure muxer')
-                    raise ThrowReply('{} when attempting to configure endpoint named "{}"'.format(error_data,child))
-            ch_scan_list.append(str(self.endpoints[child].ch_number))
-            self.endpoints[child].log_interval = self.scan_interval
-
-        scan_list_cmd = 'ROUT:SCAN (@{})'.format(','.join(ch_scan_list))
-        self.send([scan_list_cmd+';*OPC?',\
-                   'TRIG:SOUR TIM;*OPC?',\
-                   'TRIG:COUN INF;*OPC?',\
-                   'TRIG:TIM {};*OPC?'.format(self.scan_interval),\
-                   'INIT;*ESE?'])
+        logger.info(self.sync_children)
+        logger.info(self)
+        #self.configure_scan()
 
 __all__.append("MuxerGetEntity")
 class MuxerGetEntity(Entity):
