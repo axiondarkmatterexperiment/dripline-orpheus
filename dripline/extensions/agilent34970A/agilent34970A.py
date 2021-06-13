@@ -4,6 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 import time
 from .muxer_calibrations import pt100_cal
+from .muxer_calibrations import x83871_cal
 
 __all__ = []
 
