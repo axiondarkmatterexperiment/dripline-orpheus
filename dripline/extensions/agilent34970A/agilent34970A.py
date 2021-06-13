@@ -20,6 +20,8 @@ class MuxerService(EthernetSCPIService):
 
         ch_scan_list = list()
         logger.info(self.sync_children)
+        logger.info(self)
+        logger.info(self.__dict__)
         for child in self.sync_children:
 
             logger.info(child)
@@ -57,9 +59,6 @@ class MuxerService(EthernetSCPIService):
             raise ThrowReply("scan interval must be > 0")
             #raise exceptions.DriplineValueError("scan interval must be > 0")
         self.scan_interval = scan_interval
-        logger.info(self.sync_children)
-        logger.info(self)
-        #self.configure_scan()
 
 __all__.append("MuxerGetEntity")
 class MuxerGetEntity(Entity):
@@ -86,7 +85,10 @@ class MuxerGetEntity(Entity):
     @calibrate([pt100_cal])
     def on_get(self):
         result = self.service.send_to_device([self.get_str.format(self.ch_number)])
+        if not result:
+            raise ThrowReply("result from on_get is empty")
         logger.debug('very raw is: {}'.format(result))
+        logger.info("Result in on_get:")
         return result.split()[0]
 
     def on_set(self, value):
