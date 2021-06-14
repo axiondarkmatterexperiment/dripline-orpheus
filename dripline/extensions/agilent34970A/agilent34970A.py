@@ -83,7 +83,7 @@ class MuxerGetEntity(Entity):
         self.conf_str = conf_str.format(ch_number)
         Entity.__init__(self, **kwargs)
 
-    @calibrate([pt100_cal])
+    @calibrate([pt100_cal, x83871_cal])
     def on_get(self):
         result = self.service.send_to_device([self.get_str.format(self.ch_number)])
         if not result:
