@@ -5,6 +5,7 @@ import os
 
 
 logger = logging.getLogger(__name__)
+file_dir = os.path.abspath(os.path.dirname(__file__))
 
 __all__ = []
 def piecewise_cal(values_x, values_y, this_x, log_x=False, log_y=False):
@@ -33,9 +34,7 @@ def piecewise_cal(values_x, values_y, this_x, log_x=False, log_y=False):
 
 def x83871_cal(resistance):
     '''calibration for cernox'''
-    logging.info(os.getcwd())
-    print(os.getcwd())
-    M = np.loadtxt('./temperature_sensor_calibrations/x83781_calibration.txt')
+    M = np.loadtxt(file_dir+'/temperature_sensor_calibrations/x83781_calibration.txt', delimiter = ',')
     resistance_cal = M[0,:]
     temperature_cal = M[1,:]
     interpolated_temperature = np.interp(resistance, resistance_cal, temperature_cal)
