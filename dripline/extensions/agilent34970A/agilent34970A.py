@@ -3,7 +3,7 @@ from dripline.implementations import EthernetSCPIService
 import logging
 logger = logging.getLogger(__name__)
 import time
-from .muxer_calibrations import x83871_cal
+from .muxer_calibrations import x83781_cal
 from .muxer_calibrations import x76690_cal
 from .muxer_calibrations import ruox202a_cal
 
@@ -84,7 +84,7 @@ class MuxerGetEntity(Entity):
         self.conf_str = conf_str.format(ch_number)
         Entity.__init__(self, **kwargs)
 
-    @calibrate([x83871_cal, x76690_cal, ruox202a_cal])
+    @calibrate([x83781_cal, x76690_cal, ruox202a_cal])
     def on_get(self):
         result = self.service.send_to_device([self.get_str.format(self.ch_number)])
         if not result:

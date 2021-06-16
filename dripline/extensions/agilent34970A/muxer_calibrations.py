@@ -24,12 +24,12 @@ def _temp_from_calibration_file(resistance, calibration_file):
     interpolated_temperature = float(interpolated_function(resistance)) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
     return interpolated_temperature
 
-def x83871_cal(resistance):
+def x83781_cal(resistance):
     '''calibration for cernox'''
-    calibration_file = calibration_dir + '/x83871_calibration.txt'
+    calibration_file = calibration_dir + '/x83781_calibration.txt'
     interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
     return interpolated_temperature
-__all__.append("x83871_cal")
+__all__.append("x83781_cal")
 
 def x76690_cal(resistance):
     '''calibration for cernox'''
