@@ -31,6 +31,14 @@ def x83871_cal(resistance):
     return interpolated_temperature
 __all__.append("x83871_cal")
 
+def x76690_cal(resistance):
+    '''calibration for cernox'''
+    calibration_file = calibration_dir + '/x76690_calibration.txt'
+    interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
+    return interpolated_temperature
+__all__.append("x76690_cal")
+
+
 def ruox202a_cal(resistance):
     '''calibration for uncalibrated RuOx 202a'''
     calibration_file = calibration_dir + '/ruox202a_calibration.txt'
