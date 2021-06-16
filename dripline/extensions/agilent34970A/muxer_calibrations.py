@@ -21,7 +21,7 @@ def _temp_from_calibration_file(resistance, calibration_file):
     resistance_cal = M[0,:]
     temperature_cal = M[1,:]
     interpolated_function = interp1d(resistance_cal, temperature_cal, kind = 'cubic')
-    interpolated_temperature = float(interpolated_function(resistance)) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
+    interpolated_temperature = float(interpolated_function(abs(resistance))) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
     return interpolated_temperature
 
 def x83781_cal(resistance):
