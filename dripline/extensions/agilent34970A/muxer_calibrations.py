@@ -21,15 +21,23 @@ def _temp_from_calibration_file(resistance, calibration_file):
     resistance_cal = M[0,:]
     temperature_cal = M[1,:]
     interpolated_function = interp1d(resistance_cal, temperature_cal, kind = 'cubic')
-    interpolated_temperature = float(interpolated_function(resistance)) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
+    interpolated_temperature = float(interpolated_function(abs(resistance))) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
     return interpolated_temperature
 
-def x83871_cal(resistance):
+def x83781_cal(resistance):
     '''calibration for cernox'''
-    calibration_file = calibration_dir + '/x83871_calibration.txt'
+    calibration_file = calibration_dir + '/x83781_calibration.txt'
     interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
     return interpolated_temperature
-__all__.append("x83871_cal")
+__all__.append("x83781_cal")
+
+def x76690_cal(resistance):
+    '''calibration for cernox'''
+    calibration_file = calibration_dir + '/x76690_calibration.txt'
+    interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
+    return interpolated_temperature
+__all__.append("x76690_cal")
+
 
 def ruox202a_cal(resistance):
     '''calibration for uncalibrated RuOx 202a'''
