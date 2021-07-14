@@ -5,6 +5,8 @@ general_configs:
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
   digitization_time: 30
+  fft_size: 42002
+  sampling_rate: 125000000
   vna_power: -5
   if_center: 29500000
   lo_power: 16
