@@ -34,8 +34,12 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 data_logger = DataLogger(auths_file)
 
+#make sure we start off with good settings, no matter what the current state is
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
+data_logger.turn_off_all_switches()
 data_logger.initialize_lo(lo_power)
+data_logger.enable_all_motors()
+the_interface.set('na_output_enable', 1)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
@@ -75,7 +79,7 @@ try:
         if not (i%widescan_interval):
             the_interface.set('na_measurement_status', 'start_measurement')
             the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
-            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan')
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
 
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
