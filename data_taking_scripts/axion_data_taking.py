@@ -104,10 +104,18 @@ try:
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
         stop_t1 = time.time()
         data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width)
-
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
-        
         start_t2 = time.time()
+
+        #record power going to digitizer, -20 dBm
+        the_interface.cmd('power_monitor_voltage', 'scheduled_log')
+
+        # measure transmission after digitization to check for mechanical drifting
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
+        measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
+        f_transmission_drift = measured_fo - measured_fo_stability_check
+        the_interface.set('f_transmission_drift', f_transmission_drift)
+        
+
         the_interface.set('axion_record_spectrum_status', 'stop_measurement')
 
         # log reflection measurements
