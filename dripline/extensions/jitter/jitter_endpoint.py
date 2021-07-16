@@ -3,6 +3,10 @@ import sys
 
 from dripline.core.calibrate import calibrate
 from dripline.implementations import KeyValueStore
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 __all__ = []
 
 __all__.append("JitterEntity")
@@ -41,6 +45,10 @@ class JitterEntity(KeyValueStore):
         *Note* you generally don't need to do this, it is just here to serve as an example
         of adding and using a function with arbitrary logic.
         '''
+        logger.info('help me')
         if new_seed is None:
             self._seed = random.randrange(sys.maxsize)
         random.seed(self._seed)
+    def wait_for_no_reason(self, sleep_time=30):
+        time.sleep(sleep_time)
+
