@@ -99,7 +99,7 @@ class DataLogger:
         self.switch_transmission_path()
         self.cmd_interface.set('na_commands', 'clear_averages')
         self.log_switch_settings()
-        self.cmd_interface.get(tranmission_endpoint)
+        self.cmd_interface.get(transmission_endpoint)
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd(transmission_endpoint, 'scheduled_log')
         if fitting:
@@ -294,7 +294,7 @@ class DataLogger:
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
         time.sleep(0.5)
 
-    def round_to_nearest_multiple(a_number, base):
+    def _round_to_nearest_multiple(self, a_number, base):
         return base*round(a_number/base)
 
 
@@ -308,9 +308,10 @@ class DataLogger:
         #self.disable_all_motors()
         
         #round lo frequency to nearest bin width to make sure RF bins are aligned for  grand spectrum.
-        lo_frequequency = round_to_nearest_multiple(resonant_frequency-if_center, fft_bin_width)
+        lo_frequency = self._round_to_nearest_multiple(resonant_frequency-if_center, fft_bin_width)
         
         self.cmd_interface.set('lo_freq', lo_frequency)
+        time.sleep(0.3)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
