@@ -286,43 +286,44 @@ class DataLogger:
         self.cmd_interface.set('curved_mirror_status_command', 'motor_disable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_disable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_disable')
-        time.sleep(0.5)
 
     def enable_all_motors(self):
         self.cmd_interface.set('curved_mirror_status_command', 'motor_enable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_enable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
-        time.sleep(0.5)
 
     def _round_to_nearest_multiple(self, a_number, base):
         return base*round(a_number/base)
 
 
-    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0):
+    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, log_power_monitor = False, disable_motors = False):
         ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
         dl_logger.info('Now digitizing')
-        self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0.
+        self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0. Otherwise you would see RFI.
         self.switch_digitization_path()
 
-        #I will go back to disabling, re-enabling motors if I see any suspicious RFI.
-        #self.disable_all_motors()
+        if disable_motors: 
+            self.disable_all_motors()
         
         #round lo frequency to nearest bin width to make sure RF bins are aligned for  grand spectrum.
         lo_frequency = self._round_to_nearest_multiple(resonant_frequency-if_center, fft_bin_width)
         
         self.cmd_interface.set('lo_freq', lo_frequency)
-        time.sleep(0.3)
+        time.sleep(0.2)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+
+        self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
             dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
-            time.sleep(1)
+            time.sleep(2)
         #self.enable_all_motors()
         dl_logger.info('Done digitizing')
         self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1
+        time.sleep(0.2)
 
 
     def start_modemap(self, modemap_notes = ''):

@@ -10,7 +10,7 @@ general_configs:
   vna_power: -5
   if_center: 29500000
   lo_power: 16
-  widescan_interval: 10
+  widescan_interval: 20
 
 measurement_configs:
   empty_resonator:
@@ -33,7 +33,7 @@ measurement_configs:
     #starting_fo: 16949000000 # expected TEM_00-18 mode at initial spacing.
     starting_fo:  17905500000# expected TEM_00-18 mode at initial spacing.
     sweep_points: 512
-    increment_distance: 0.0001 #in.
+    increment_distance: 0.0005 #in.
     distance_to_move: 2 # cm
     sec_wait_for_na_transmission_averaging: 1.5
     sec_wait_for_na_reflection_averaging: 1.5
@@ -42,4 +42,5 @@ measurement_configs:
     narrow_scan_span_focus: 20000000
     averaging_time_for_fo_guess_measurement: 1
     average_enable: 1 #must be 1 or 0
+    disable_motors_while_digitizing: True
 

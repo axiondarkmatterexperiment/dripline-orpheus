@@ -17,4 +17,4 @@ rf_center_frequency =  17.90485e9
 if_center = 29.5e6
 digitization_time = 30
 
-data_logger.digitize(rf_center_frequency, if_center, digitization_time, fft_bin_width)
+data_logger.digitize(rf_center_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True)
