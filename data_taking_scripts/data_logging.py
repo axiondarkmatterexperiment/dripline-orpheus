@@ -90,19 +90,20 @@ class DataLogger:
         dl_logger.info('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, autoscale = False, fitting = False):
+    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, transmission_endpoint = None):
         dl_logger.info('Measuring transmission with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
+        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         self.switch_transmission_path()
         self.cmd_interface.set('na_commands', 'clear_averages')
         self.log_switch_settings()
-        self.cmd_interface.get('s21_iq_transmission_data')
+        self.cmd_interface.get(transmission_endpoint)
         time.sleep(sec_wait_for_na_averaging)
-        self.cmd_interface.cmd('s21_iq_transmission_data', 'scheduled_log')
+        self.cmd_interface.cmd(transmission_endpoint, 'scheduled_log')
         if fitting:
-            s21_iq = self.cmd_interface.get('s21_iq_transmission_data').payload.to_python()['value_cal']
+            s21_iq = self.cmd_interface.get(transmission_endpoint).payload.to_python()['value_cal']
             s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
@@ -115,30 +116,36 @@ class DataLogger:
             dl_logger.info('Transmission lorentzian fitted parameters')
             dl_logger.info(popt_transmission)
 
-            self.cmd_interface.set('f_transmission', popt_transmission[0])
-            self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
-            self.cmd_interface.set('Q_transmission', popt_transmission[1])
-            self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
-            self.cmd_interface.set('dy_transmission', popt_transmission[2])
-            self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
-            self.cmd_interface.set('C_transmission', popt_transmission[3])
-            self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
+            if transmission_endpoint == 's21_iq_transmission_data_stability_check':
+                self.cmd_interface.set('f_transmission_stability_check', popt_transmission[0])
+                self.cmd_interface.set('Q_transmission_stability_check', popt_transmission[1])
+                self.cmd_interface.set('dy_transmission_stability_check', popt_transmission[2])
+                self.cmd_interface.set('C_transmission_stability_check', popt_transmission[3])
+            else:
+                self.cmd_interface.set('f_transmission', popt_transmission[0])
+                self.cmd_interface.set('sig_f_transmission', perr_transmission[0])
+                self.cmd_interface.set('Q_transmission', popt_transmission[1])
+                self.cmd_interface.set('sig_Q_transmission', perr_transmission[1])
+                self.cmd_interface.set('dy_transmission', popt_transmission[2])
+                self.cmd_interface.set('sig_dy_transmission', perr_transmission[2])
+                self.cmd_interface.set('C_transmission', popt_transmission[3])
+                self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, autoscale = False, fitting = False):
+    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, reflection_endpoint = 's21_iq_reflection_data'):
         dl_logger.info('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
-
+        self.cmd_interface.set('na_measurement_status_explanation', na_iq_data_notes)
         self.switch_reflection_path()
         self.log_switch_settings()
-        self.cmd_interface.get('s21_iq_reflection_data')
+        self.cmd_interface.get(reflection_endpoint)
         self.cmd_interface.set('na_commands', 'clear_averages')
         time.sleep(sec_wait_for_na_reflection_averaging)
-        self.cmd_interface.cmd('s21_iq_reflection_data', 'scheduled_log')
+        self.cmd_interface.cmd(reflection_endpoint, 'scheduled_log')
         if fitting:
-            s11_iq = self.cmd_interface.get('s21_iq_reflection_data').payload.to_python()['value_cal']
+            s11_iq = self.cmd_interface.get(reflection_endpoint).payload.to_python()['value_cal']
             s11_re, s11_im = np.array(s11_iq[::2]), np.array(s11_iq[1::2])
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
@@ -279,33 +286,44 @@ class DataLogger:
         self.cmd_interface.set('curved_mirror_status_command', 'motor_disable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_disable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_disable')
-        time.sleep(0.5)
 
     def enable_all_motors(self):
         self.cmd_interface.set('curved_mirror_status_command', 'motor_enable')
         self.cmd_interface.set('bottom_dielectric_plate_status_command', 'motor_enable')
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
-        time.sleep(0.5)
 
-    def digitize(self, resonant_frequency, if_center, digitization_time, vna_output_enable = 0):
+    def _round_to_nearest_multiple(self, a_number, base):
+        return base*round(a_number/base)
+
+
+    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, log_power_monitor = False, disable_motors = False):
         ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
         dl_logger.info('Now digitizing')
-        self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0.
+        self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0. Otherwise you would see RFI.
         self.switch_digitization_path()
-        #I will go back to disabling, re-enabling motors if I see any suspicious RFI.
-        #self.disable_all_motors()
-        self.cmd_interface.set('lo_freq', resonant_frequency - if_center)
+
+        if disable_motors: 
+            self.disable_all_motors()
+        
+        #round lo frequency to nearest bin width to make sure RF bins are aligned for  grand spectrum.
+        lo_frequency = self._round_to_nearest_multiple(resonant_frequency-if_center, fft_bin_width)
+        
+        self.cmd_interface.set('lo_freq', lo_frequency)
+        time.sleep(0.2)
         self.cmd_interface.cmd('fast_daq', 'start-run')
         time.sleep(digitization_time)
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+
+        self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
             dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
-            time.sleep(1)
+            time.sleep(2)
         #self.enable_all_motors()
         dl_logger.info('Done digitizing')
         self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1
+        time.sleep(0.2)
 
 
     def start_modemap(self, modemap_notes = ''):

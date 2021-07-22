@@ -34,8 +34,12 @@ the_interface = Interface(dripline_config={'auth-file': auths_file})
 orpheus_motors = OrpheusMotors(auths_file, motors_to_move)
 data_logger = DataLogger(auths_file)
 
+#make sure we start off with good settings, no matter what the current state is
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
+data_logger.turn_off_all_switches()
 data_logger.initialize_lo(lo_power)
+data_logger.enable_all_motors()
+the_interface.set('na_output_enable', 1)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
 measurement_description = input('Describe the current measurement setup: ')
@@ -61,6 +65,7 @@ narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
 the_interface.set('target_fo', resonant_freq_guess)
 target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
 
+fft_bin_width = sampling_rate/fft_size
 
 i = 0
 try:
@@ -74,7 +79,7 @@ try:
         if not (i%widescan_interval):
             the_interface.set('na_measurement_status', 'start_measurement')
             the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
-            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan')
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
 
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
@@ -91,21 +96,32 @@ try:
         the_interface.set('axion_record_spectrum_status', 'start_measurement')
         the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
 
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True)
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data')
 
-        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_reflection_averaging, fitting = True)
+        data_logger.log_reflection_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_reflection_averaging, fitting = True, reflection_endpoint = 's21_iq_reflection_data')
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
         stop_t1 = time.time()
-        data_logger.digitize(measured_fo, if_center, digitization_time)
+        data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
         start_t2 = time.time()
+
+        #record power going to digitizer, -20 dBm
+        the_interface.cmd('power_monitor_voltage', 'scheduled_log')
+
+        # measure transmission after digitization to check for mechanical drifting
+        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
+        measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
+        f_transmission_drift = measured_fo - measured_fo_stability_check
+        the_interface.set('f_transmission_drift', f_transmission_drift)
+        
+
         the_interface.set('axion_record_spectrum_status', 'stop_measurement')
 
         # log reflection measurements
         if not (i%widescan_interval):
             #switch is already in the reflection position. we just need to change the frequency range. So we don't have to average as long to have the system settle down.
-            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan')
+            data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, na_iq_data_notes = 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
             the_interface.set('na_measurement_status', 'stop_measurement')
 
         #adjust target fo
