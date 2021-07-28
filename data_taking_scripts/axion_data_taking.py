@@ -72,7 +72,7 @@ try:
     delta_length = 0
     print('Resonator length: {}'.format(current_resonator_length_cm))
     while delta_length < abs(distance_to_move):
-        start_t1 = time.time()
+        start_cadence_time = time.time()
         if the_interface.get('axion_data_taking_status').payload.to_python()['value_cal'] == 'stop_measurement':
             break
         #take transmission measurement
@@ -102,9 +102,7 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-        stop_t1 = time.time()
         data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
-        start_t2 = time.time()
 
         #record power going to digitizer, -20 dBm
         the_interface.cmd('power_monitor_voltage', 'scheduled_log')
@@ -139,9 +137,9 @@ try:
         current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
         i += 1
-        stop_t2 = time.time()
-        deadtime = (stop_t1-start_t1) + (stop_t2-start_t2)
-        the_interface.set('non_digitization_time', deadtime)
+        stop_cadence_time = time.time()
+        cadence_time = stop_cadence_time-start_cadence_time
+        the_interface.set('cadence_time', cadence_time)
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
