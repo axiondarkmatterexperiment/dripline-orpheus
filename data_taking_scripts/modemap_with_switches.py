@@ -47,6 +47,7 @@ data_logger = DataLogger(auths_file)
 measurement_description = input('Describe the current measurement setup: ')
 
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
+data_logger.enable_all_motors()
 orpheus_motors.move_to_zero()
 orpheus_motors.wait_for_motors()
 
