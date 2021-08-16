@@ -18,5 +18,5 @@ __all__.append("version")
 
 from .power_detector import *
 from .power_detector import __all__ as __power_detector_all
-__all__ += __agilent34970A_all
+__all__ += __power_detector_all
 
