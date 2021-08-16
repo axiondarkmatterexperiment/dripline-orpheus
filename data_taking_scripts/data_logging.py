@@ -165,16 +165,9 @@ class DataLogger:
             self.cmd_interface.set('dy_reflection', popt_reflection[2])
             self.cmd_interface.set('C_reflection', popt_reflection[3])
 
-            
             cavity_phase = deconvolve_phase(freq, s11_phase)
-            cavity_reflection_interp_phase = interp1d(freq, cavity_phase, kind='cubic')
-            phase_at_resonance = cavity_reflection_interp_phase(popt_reflection[0])
 
-            if popt_reflection[2] >= popt_reflection[3]:
-                beta = 1
-            else:
-                cavity_reflection_at_resonance = np.sqrt((popt_reflection[3]-popt_reflection[2])/popt_reflection[3])
-                antenna_coupling = calculate_coupling(cavity_reflection_at_resonance, phase_at_resonance)
+            antenna_coupling = calculate_coupling(popt_reflection[2]/popt_reflection[3], cavity_phase)
 
             dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
             self.cmd_interface.set('antenna_coupling', antenna_coupling)

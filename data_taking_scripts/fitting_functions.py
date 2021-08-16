@@ -136,9 +136,30 @@ def deconvolve_phase(freq, measured_reflected_phase):
     deconvolved_phase = measured_reflected_phase - delay_phase
     return deconvolved_phase
 
-def calculate_coupling(mag_fo, phase_fo):
-    """Calculate coupling to a cavity after reflection fit is done"""
-    # TODO add error propogation
-    sgn = np.sign(phase_fo-np.pi) ## phase_fo has range of [-pi,pi]
-    beta = (1+sgn*mag_fo)/(1-sgn*mag_fo)
+#def calculate_coupling(mag_fo, phase_fo):
+#    """Calculate coupling to a cavity after reflection fit is done"""
+#    # TODO add error propogation
+#    sgn = np.sign(phase_fo-np.pi) ## phase_fo has range of [-pi,pi]
+#    beta = (1+sgn*mag_fo)/(1-sgn*mag_fo)
+#    return beta
+
+def determine_if_undercoupled(s11_phase):
+    '''Assumes the largest derivative in phase occurs on resonance. 
+    If the derivative is positive on resonance, then it it undercoupled.
+    If the derivative is negative on resonance, then it is overcoupled 
+    Returns 1 if undercoupled. Else returns 0.
+    '''
+    f0_derivative = np.max(np.gradient(s11_phase))
+    return f0_derivative > 0
+
+def calculate_coupling(dy_over_C, s11_phase):
+    '''
+    Takes the Lorentzian dip normalized to the s11 background to calculate the coupling coefficient.
+    '''
+    if dy_over_C > 1: return 1
+    Gamma_cav_f0 = umath.sqrt(1-dy_over_C)
+    if determine_if_undercoupled(s11_phase):
+        beta = (1 - Gamma_cav_f0)/(1+Gamma_cav_f0)
+    else:
+        beta = (1 + Gamma_cav_f0)/(1-Gamma_cav_f0)
     return beta
