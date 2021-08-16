@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 __all__ = []
 
 __all__.append("PowerDetectorEntity")
-class PowerDetectorEntity(Entity):
+class PowerDetectorEntity(SimpleSCPIEntity):
     '''
     Entity with power detector calibration
     '''
