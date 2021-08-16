@@ -12,7 +12,7 @@ except:
     pass
 version = scarab.VersionSemantic()
 version.parse(a_ver)
-version.package = 'agilent34970A__plugin'
+version.package = 'agilent34970A_plugin'
 version.commit = '---'
 __all__.append("version")
 

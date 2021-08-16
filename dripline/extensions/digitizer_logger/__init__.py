@@ -12,7 +12,7 @@ except:
     pass
 version = scarab.VersionSemantic()
 version.parse(a_ver)
-version.package = 'digitizer_logger__plugin'
+version.package = 'digitizer_logger_plugin'
 version.commit = '---'
 __all__.append("version")
 
