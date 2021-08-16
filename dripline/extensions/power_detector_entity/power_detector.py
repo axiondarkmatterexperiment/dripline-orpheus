@@ -15,7 +15,9 @@ class PowerDetectorEntity(SimpleSCPIEntity):
 
     @calibrate([zx47_50_cal])
     def on_get(self):
-        return super().on_get()
-
+        to_send = [self.cmd_base + '?']
+        result = self.service.send_to_device(to_send)
+        logger.debug(f'raw result is: {result}')
+        return result
 
 
