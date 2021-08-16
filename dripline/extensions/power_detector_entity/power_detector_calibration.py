@@ -21,7 +21,7 @@ def _power_from_calibration_file(voltage, calibration_file):
     voltage_cal = M[0,:]
     power_cal = M[1,:]
     interpolated_function = interp1d(voltage_cal, power_cal, kind = 'cubic')
-    interpolated_power = float(interpolated_function(abs(voltage))) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
+    interpolated_power = float(interpolated_function(voltage)) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
     return interpolated_power
 
 def zx47_50_cal(resistance):
