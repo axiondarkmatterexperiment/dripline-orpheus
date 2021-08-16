@@ -1,5 +1,5 @@
 from dripline.core import Entity, calibrate, ThrowReply
-from dripline.implementations import EthernetSCPIService
+from dripline.implementations import SimpleSCPIEntity
 import logging
 from .power_detector_calibration import zx47_50_cal
 
