@@ -15,9 +15,7 @@ class PowerDetectorEntity(SimpleSCPIEntity):
 
     @calibrate([zx47_50_cal])
     def on_get(self):
-        return self._value
+        return super().on_get()
 
-    def on_set(self, value):
-        raise ThrowReply('setting not available for {}'.format(self.name))
 
 
