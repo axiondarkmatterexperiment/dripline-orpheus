@@ -27,7 +27,7 @@ def _power_from_calibration_file(voltage, calibration_file):
 def zx47_50_cal(voltage):
     '''calibration for zx47-50 power detector'''
     calibration_file = calibration_dir + '/zx4750_calibration.csv'
-    interpolated_temperature = _temp_from_calibration_file(voltage, calibration_file)
+    interpolated_temperature = _power_from_calibration_file(voltage, calibration_file)
     return interpolated_temperature
 __all__.append("zx47_50_cal")
 
