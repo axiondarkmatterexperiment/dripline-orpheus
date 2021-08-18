@@ -12,7 +12,7 @@ except:
     pass
 version = scarab.VersionSemantic()
 version.parse(a_ver)
-version.package = 'entities_snapshotter__plugin'
+version.package = 'entities_snapshotter_plugin'
 version.commit = '---'
 __all__.append("version")
 
