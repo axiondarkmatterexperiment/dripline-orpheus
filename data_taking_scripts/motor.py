@@ -114,13 +114,15 @@ class OrpheusMotors:
             time.sleep(1)
         print('done waiting')
 
-    def move_to_zero(self):
+    def move_to_zero(self, move_one_motor_at_a_time  = False):
         ''' Moves the motors to 0. '''
         for motor in self.motors:
             motor.move_to_zero()
+            if move_one_motor_at_a_time:
+                self.wait_for_motors()
 
     def move_by_increment(self, increment_distance,cavity_length_tracker,
-                          num_plates, plate_separation):
+                          num_plates, plate_separation, move_one_motor_at_a_time  = False):
         ''' Moves initialized motors in a coordinated manner.
             Keeps the dielectric plates even spaced.
             Returns the new resonator length and the new separation
@@ -135,6 +137,8 @@ class OrpheusMotors:
             curved_mirror_steps = self.distance_to_steps(increment_distance)
             print(F'Moving curved mirror motor by {curved_mirror_steps} steps')
             self.motors[cm_ind].move_steps(curved_mirror_steps)
+            if move_one_motor_at_a_time:
+                self.wait_for_motors()
 
         if 'bottom_dielectric_plate' in self.motor_names:
             bdp_ind = self.motor_names.index('bottom_dielectric_plate')
@@ -143,6 +147,8 @@ class OrpheusMotors:
             bottom_plate_steps = self.distance_to_steps(move_bottom_plate)
             print(F'Moving bottom plate motor by {bottom_plate_steps} steps')
             self.motors[bdp_ind].move_steps(bottom_plate_steps)
+            if move_one_motor_at_a_time:
+                self.wait_for_motors()
 
         if 'top_dielectric_plate' in self.motor_names:
             tdp_ind = self.motor_names.index('top_dielectric_plate')
@@ -150,6 +156,8 @@ class OrpheusMotors:
             top_plate_steps = self.distance_to_steps(move_top_plate)
             print(F'Moving top plate motor by {top_plate_steps} steps')
             self.motors[tdp_ind].move_steps(top_plate_steps)
+            if move_one_motor_at_a_time:
+                self.wait_for_motors()
 
         return cavity_length_tracker, new_plate_separation
 
