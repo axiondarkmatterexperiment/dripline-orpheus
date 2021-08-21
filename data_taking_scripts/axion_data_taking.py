@@ -106,16 +106,20 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-        data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
+        if increment_distance: 
+            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
+        else: 
+            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True)
 
         #record power going to digitizer, -20 dBm
         the_interface.cmd('power_monitor_voltage', 'scheduled_log')
 
         # measure transmission after digitization to check for mechanical drifting
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
-        measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
-        f_transmission_drift = measured_fo - measured_fo_stability_check
-        the_interface.set('f_transmission_drift', f_transmission_drift)
+        if stability_check:
+            data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
+            measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
+            f_transmission_drift = measured_fo - measured_fo_stability_check
+            the_interface.set('f_transmission_drift', f_transmission_drift)
         
 
         the_interface.set('axion_record_spectrum_status', 'stop_measurement')
@@ -137,10 +141,10 @@ try:
                                                                                              num_plates,
                                                                                              current_plate_separation)
             orpheus_motors.wait_for_motors()
+            current_plate_separation = new_plate_separation
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
 
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
-        current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
         i += 1
         stop_cadence_time = time.time()
