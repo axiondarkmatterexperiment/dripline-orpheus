@@ -47,8 +47,7 @@ data_logger = DataLogger(auths_file)
 measurement_description = input('Describe the current measurement setup: ')
 
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
-data_logger.enable_all_motors()
-orpheus_motors.move_to_zero()
+orpheus_motors.move_to_zero(move_one_motor_at_a_time = True)
 orpheus_motors.wait_for_motors()
 
 #Send alert saying you are starting the modemap measurement
@@ -91,7 +90,8 @@ try:
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
-                                                                                             current_plate_separation)
+                                                                                             current_plate_separation,
+                                                                                             move_one_motor_at_a_time = True)
         orpheus_motors.wait_for_motors()
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
 

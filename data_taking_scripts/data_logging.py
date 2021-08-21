@@ -289,7 +289,7 @@ class DataLogger:
         return base*round(a_number/base)
 
 
-    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, log_power_monitor = False, disable_motors = False):
+    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, keep_vna_off = True, log_power_monitor = False, disable_motors = False):
         ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
         dl_logger.info('Now digitizing')
         self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0. Otherwise you would see RFI.
@@ -315,7 +315,8 @@ class DataLogger:
             time.sleep(2)
         #self.enable_all_motors()
         dl_logger.info('Done digitizing')
-        self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1
+        if not keep_vna_off:
+            self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1. May keep vna off for Y-factor measurements.
         time.sleep(0.2)
 
 
@@ -335,6 +336,15 @@ class DataLogger:
         self.cmd_interface.set('axion_data_taking_status_explanation', axion_data_taking_notes)
 
     def stop_axion_data_taking(self):
+        self.cmd_interface.set('axion_data_taking_status', 'stop_measurement')
+
+    def start_yfactor_measurement(self, yfactor_measurement_notes = ''):
+        # TODO throw error if notes isn't a string.
+        self.cmd_interface.set('yfactor_measurement_status', 'start_measurement')
+        # TODO write if statement
+        self.cmd_interface.set('yfactor_measurement_status_explanation', yfactor_measurement_notes)
+
+    def stop_yfactor_measurement(self):
         self.cmd_interface.set('axion_data_taking_status', 'stop_measurement')
 
     def log_s21(self, sleep_time = 0):
