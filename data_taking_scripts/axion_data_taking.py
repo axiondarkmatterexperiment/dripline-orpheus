@@ -51,6 +51,7 @@ current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
+starting_fo = input('What is the current frequency of the TEM_00-18 mode')
 the_interface.set('target_fo', starting_fo)
 
 #find initial VNA window for narrowscan measurements
@@ -125,12 +126,14 @@ try:
         #adjust target fo
         the_interface.set('target_fo', measured_fo)
 
-        #move plates
-        current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
+        #move plates if increment_distance is anything other than 0.
+        if increment_distance: 
+            #TODO figure out what to do with negative increment_distance
+            current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
                                                                                              current_plate_separation)
-        orpheus_motors.wait_for_motors()
+            orpheus_motors.wait_for_motors()
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
 
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
