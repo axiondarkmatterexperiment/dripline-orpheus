@@ -38,7 +38,6 @@ data_logger = DataLogger(auths_file)
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 data_logger.turn_off_all_switches()
 data_logger.initialize_lo(lo_power)
-data_logger.enable_all_motors()
 the_interface.set('na_output_enable', 1)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
