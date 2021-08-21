@@ -14,6 +14,7 @@ def cm_to_inch(dist):
 def inch_to_cm(dist):
     return dist*2.54
 
+starting_fo = input('What is the current frequency of the TEM_00-18 mode?: ')
 #configure data taking
 config_file = open("axion_data_taking_config.yaml")
 configs = yaml.load(config_file, Loader =yaml.FullLoader)
@@ -50,7 +51,6 @@ current_resonator_length_cm = initial_mirror_holder_spacing+1.05
 current_resonator_length_in = cm_to_inch(current_resonator_length_cm)
 current_plate_separation = orpheus_motors.plate_separation(current_resonator_length_in,num_plates)
 
-starting_fo = input('What is the current frequency of the TEM_00-18 mode')
 the_interface.set('target_fo', starting_fo)
 
 #find initial VNA window for narrowscan measurements
@@ -145,7 +145,8 @@ try:
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
-    orpheus_motors.stop_and_kill()
+    if increment_distance:
+        orpheus_motors.stop_and_kill()
     data_logger.start_axion_data_taking()
 
 data_logger.turn_off_all_switches()
