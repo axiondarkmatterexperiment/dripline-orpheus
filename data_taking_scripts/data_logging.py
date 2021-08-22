@@ -114,6 +114,7 @@ class DataLogger:
                 sys.exit()
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
             dl_logger.info('Transmission lorentzian fitted parameters')
+            dl_logger.info('f, Q, dy, C')
             dl_logger.info(popt_transmission)
 
             if transmission_endpoint == 's21_iq_transmission_data_stability_check':
@@ -159,6 +160,7 @@ class DataLogger:
                 sys.exit()
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
             dl_logger.info('Reflection lorentzian fitted parameters')
+            dl_logger.info('f, Q, dy, C')
             dl_logger.info(popt_reflection)
             self.cmd_interface.set('f_reflection', popt_reflection[0])
             self.cmd_interface.set('Q_reflection', popt_reflection[1])
@@ -169,8 +171,13 @@ class DataLogger:
 
             antenna_coupling = calculate_coupling(popt_reflection[2]/popt_reflection[3], cavity_phase)
 
+
             dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
             self.cmd_interface.set('antenna_coupling', antenna_coupling)
+
+            Qu_reflection = popt_reflection[1]*(1+antenna_coupling)
+            dl_logger.info("Unloaded Q from reflection measurement is : {}".format(Qu_reflection))
+            self.cmd_interface.set('Q_unloaded_reflection', Qu_reflection)
 
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
