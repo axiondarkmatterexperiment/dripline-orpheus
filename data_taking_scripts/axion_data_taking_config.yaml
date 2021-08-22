@@ -4,7 +4,7 @@ general_configs:
     #motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
-  digitization_time: 30
+  digitization_time: 200
   fft_size: 50000
   sampling_rate: 125000000
   vna_power: -5
@@ -28,6 +28,24 @@ measurement_configs:
     average_enable: 1 #must be 1 or 0
 
   dielectric_resonator:
+    #initial_mirror_holder_spacing: 13.55 # cm total length 14.55 cm
+    initial_mirror_holder_spacing: 12.75 # cm total length 13.8 cm
+    #starting_fo: 16949000000 # expected TEM_00-18 mode at initial spacing.
+    #starting_fo:  17905500000# expected TEM_00-18 mode at initial spacing.
+    sweep_points: 512
+    increment_distance: 0.0000 #in.
+    distance_to_move: 2 # cm
+    sec_wait_for_na_transmission_averaging: 1.5
+    sec_wait_for_na_reflection_averaging: 1.5
+    averages: 16
+    narrow_scan_span_guess: 400000000
+    narrow_scan_span_focus: 20000000
+    averaging_time_for_fo_guess_measurement: 1
+    average_enable: 1 #must be 1 or 0
+    disable_motors_while_digitizing: False
+    stability_check: False
+
+  dielectric_resonator_sit_on_frequency:
     #initial_mirror_holder_spacing: 13.55 # cm total length 14.55 cm
     initial_mirror_holder_spacing: 12.75 # cm total length 13.8 cm
     #starting_fo: 16949000000 # expected TEM_00-18 mode at initial spacing.
