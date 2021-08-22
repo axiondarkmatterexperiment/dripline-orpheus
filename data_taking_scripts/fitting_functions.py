@@ -157,7 +157,7 @@ def calculate_coupling(dy_over_C, s11_phase):
     Takes the Lorentzian dip normalized to the s11 background to calculate the coupling coefficient.
     '''
     if dy_over_C > 1: return 1
-    Gamma_cav_f0 = umath.sqrt(1-dy_over_C)
+    Gamma_cav_f0 = np.sqrt(1-dy_over_C)
     if determine_if_undercoupled(s11_phase):
         beta = (1 - Gamma_cav_f0)/(1+Gamma_cav_f0)
     else:

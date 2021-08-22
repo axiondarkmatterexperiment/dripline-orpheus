@@ -289,7 +289,7 @@ class DataLogger:
         return base*round(a_number/base)
 
 
-    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, keep_vna_off = True, log_power_monitor = False, disable_motors = False):
+    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, keep_vna_off = False, log_power_monitor = False, disable_motors = False):
         ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
         dl_logger.info('Now digitizing')
         self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0. Otherwise you would see RFI.
@@ -313,7 +313,8 @@ class DataLogger:
             dl_logger.warning('Digitization is taking longer than expected')
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             time.sleep(2)
-        #self.enable_all_motors()
+        if disable_motors: 
+            self.enable_all_motors()
         dl_logger.info('Done digitizing')
         if not keep_vna_off:
             self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1. May keep vna off for Y-factor measurements.

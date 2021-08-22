@@ -14,6 +14,7 @@ def cm_to_inch(dist):
 def inch_to_cm(dist):
     return dist*2.54
 
+starting_fo = input('What is the current frequency of the TEM_00-18 mode?: ')
 #configure data taking
 config_file = open("axion_data_taking_config.yaml")
 configs = yaml.load(config_file, Loader =yaml.FullLoader)
@@ -38,7 +39,6 @@ data_logger = DataLogger(auths_file)
 data_logger.initialize_na_settings_for_modemap(averages = averages, average_enable = average_enable, power = vna_power, sweep_points = sweep_points)
 data_logger.turn_off_all_switches()
 data_logger.initialize_lo(lo_power)
-data_logger.enable_all_motors()
 the_interface.set('na_output_enable', 1)
 
 #  Ask user to describe the measurement. Forces user to document what they are doing.
@@ -94,7 +94,11 @@ try:
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
 
         the_interface.set('axion_record_spectrum_status', 'start_measurement')
-        the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
+
+        if increment_distance: 
+            the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
+        else: 
+            the_interface.cmd('axion_data_taking_short_snapshot_no_motors', 'log_entities')
 
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data')
 
@@ -102,16 +106,20 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-        data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
+        if increment_distance: 
+            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
+        else: 
+            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True)
 
         #record power going to digitizer, -20 dBm
         the_interface.cmd('power_monitor_voltage', 'scheduled_log')
 
         # measure transmission after digitization to check for mechanical drifting
-        data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
-        measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
-        f_transmission_drift = measured_fo - measured_fo_stability_check
-        the_interface.set('f_transmission_drift', f_transmission_drift)
+        if stability_check:
+            data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data_stability_check')
+            measured_fo_stability_check = the_interface.get('f_transmission_stability_check').payload.to_python()['value_cal']
+            f_transmission_drift = measured_fo - measured_fo_stability_check
+            the_interface.set('f_transmission_drift', f_transmission_drift)
         
 
         the_interface.set('axion_record_spectrum_status', 'stop_measurement')
@@ -125,16 +133,18 @@ try:
         #adjust target fo
         the_interface.set('target_fo', measured_fo)
 
-        #move plates
-        current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
+        #move plates if increment_distance is anything other than 0.
+        if increment_distance: 
+            #TODO figure out what to do with negative increment_distance
+            current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
                                                                                              current_plate_separation)
-        orpheus_motors.wait_for_motors()
+            orpheus_motors.wait_for_motors()
+            current_plate_separation = new_plate_separation
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
 
         the_interface.set('resonator_length', current_resonator_length_cm) #logging resonator length into endpoint
-        current_plate_separation = new_plate_separation
         dl_logger.info("plate separation: {}".format(current_plate_separation))
         i += 1
         stop_cadence_time = time.time()
@@ -143,7 +153,8 @@ try:
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
-    orpheus_motors.stop_and_kill()
+    if increment_distance:
+        orpheus_motors.stop_and_kill()
     data_logger.start_axion_data_taking()
 
 data_logger.turn_off_all_switches()
