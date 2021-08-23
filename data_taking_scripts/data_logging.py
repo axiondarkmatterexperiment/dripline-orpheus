@@ -317,6 +317,7 @@ class DataLogger:
             self.enable_all_motors()
         dl_logger.info('Done digitizing')
         if not keep_vna_off:
+            dl_logger.info('Enabling VNA output')
             self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1. May keep vna off for Y-factor measurements.
         time.sleep(0.2)
 
