@@ -16,4 +16,4 @@ data_logger.log_transmission_switches(start_freq,stop_freq, 1, fitting = True, t
 
 data_logger.log_reflection_switches(start_freq, stop_freq, 1, fitting = True, reflection_endpoint = 's21_iq_reflection_data')
 
-
+data_logger.turn_off_all_switches()

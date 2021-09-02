@@ -156,7 +156,7 @@ class DataLogger:
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
         if track_max_reflection:
-            self.cmd_interface.set('reflection_max', np.max(s11_pow)
+            self.cmd_interface.set('reflection_max', np.max(s11_pow))
         if fitting:
             try:
                 popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
