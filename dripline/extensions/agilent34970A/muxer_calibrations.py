@@ -46,4 +46,11 @@ def ruox202a_cal(resistance):
     return interpolated_temperature
 __all__.append("ruox202a_cal")
 
+def pt100_cal(resistance):
+    '''calibration for uncalibrated pt100'''
+    calibration_file = calibration_dir + '/pt100_calibration.txt'
+    interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
+    return interpolated_temperature
+__all__.append("pt100_cal")
+
 
