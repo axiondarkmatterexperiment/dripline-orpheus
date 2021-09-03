@@ -1,6 +1,7 @@
 general_configs:
   num_plates: 4
   motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate'] #top dielectric plate stalls
     #motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
@@ -33,7 +34,8 @@ measurement_configs:
     #starting_fo: 16949000000 # expected TEM_00-18 mode at initial spacing.
     #starting_fo:  17905500000# expected TEM_00-18 mode at initial spacing.
     sweep_points: 512
-    increment_distance: 0.0000 #in.
+    widescan_sweep_points: 2048
+    increment_distance: 0.0005 #in.
     distance_to_move: 2 # cm
     sec_wait_for_na_transmission_averaging: 1.5
     sec_wait_for_na_reflection_averaging: 1.5
@@ -42,7 +44,7 @@ measurement_configs:
     narrow_scan_span_focus: 20000000
     averaging_time_for_fo_guess_measurement: 1
     average_enable: 1 #must be 1 or 0
-    disable_motors_while_digitizing: False
+    disable_motors_while_digitizing: True
     stability_check: False
 
   dielectric_resonator_sit_on_frequency:
@@ -60,6 +62,6 @@ measurement_configs:
     narrow_scan_span_focus: 20000000
     averaging_time_for_fo_guess_measurement: 1
     average_enable: 1 #must be 1 or 0
-    disable_motors_while_digitizing: False
+    disable_motors_while_digitizing: True
     stability_check: False
 

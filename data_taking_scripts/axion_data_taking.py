@@ -79,7 +79,9 @@ try:
         if not (i%widescan_interval):
             the_interface.set('na_measurement_status', 'start_measurement')
             the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
+            the_interface.set('na_sweep_points', widescan_sweep_points)
             data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
+            the_interface.set('na_sweep_points', sweep_points)
 
         #get frequency span for narrowscan
         narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
