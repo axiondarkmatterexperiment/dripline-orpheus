@@ -1,11 +1,11 @@
 general_configs:
   num_plates: 4
-  motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
+  #motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
   motors_to_move: ['curved_mirror', 'bottom_dielectric_plate'] #top dielectric plate stalls
     #motors_to_move: ['curved_mirror']
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
-  digitization_time: 200
+  digitization_time: 30
   fft_size: 50000
   sampling_rate: 125000000
   vna_power: -5
