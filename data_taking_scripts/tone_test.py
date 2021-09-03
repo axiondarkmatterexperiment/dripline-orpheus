@@ -26,4 +26,4 @@ target_tone_power = -15 #let's just be safe.
 
 
 tone_with_vna(tone_frequency, target_tone_power)
-data_logger.digitize(tone_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True)
+data_logger.digitize(tone_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True, vna_output_enable = True)
