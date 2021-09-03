@@ -15,14 +15,15 @@ def tone_with_vna(frequency, power):
 
 data_logger = DataLogger(auths_file)
 
-vna_power_limits = [-15, -5]
-gain = 16 #dB
-tone_frequency =  17.48e9
+sampling_rate = 125e9
+fft_size = 50e3
+fft_bin_width = sampling_rate/fft_size
+tone_frequency =  16.0742e9
+
 if_center = 30e6
 digitization_time = 30
-#target_tone_power = 28-gain #aim for 28 dBm at digitizer input. Do not exceed 34 dBm at digitizer input.
 target_tone_power = -15 #let's just be safe.
 
 
 tone_with_vna(tone_frequency, target_tone_power)
-data_logger.digitize(tone_frequency, if_center, digitization_time)
+data_logger.digitize(tone_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True)
