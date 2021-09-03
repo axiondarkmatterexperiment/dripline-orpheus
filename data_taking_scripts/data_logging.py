@@ -90,7 +90,7 @@ class DataLogger:
         dl_logger.info('Setting na_measurement_status to stop_measurement')
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, transmission_endpoint = None):
+    def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, transmission_endpoint = None, track_max_transmission = False):
         dl_logger.info('Measuring transmission with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
@@ -102,11 +102,14 @@ class DataLogger:
         self.cmd_interface.get(transmission_endpoint)
         time.sleep(sec_wait_for_na_averaging)
         self.cmd_interface.cmd(transmission_endpoint, 'scheduled_log')
-        if fitting:
+        if fitting or track_max_transmission:
             s21_iq = self.cmd_interface.get(transmission_endpoint).payload.to_python()['value_cal']
             s21_re, s21_im = np.array(s21_iq[::2]), np.array(s21_iq[1::2])
             s21_pow = s21_re**2 + s21_im**2
             freq = np.linspace(start_freq, stop_freq, num = len(s21_pow))
+        if track_max_transmission:
+            self.cmd_interface.set('transmission_max', np.max(s21_pow))
+        if fitting:
             try:
                 popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             except:
@@ -133,7 +136,7 @@ class DataLogger:
                 self.cmd_interface.set('sig_C_transmission', perr_transmission[3])
         self.cmd_interface.set('na_measurement_status', 'stop_measurement')
 
-    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, reflection_endpoint = 's21_iq_reflection_data'):
+    def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, reflection_endpoint = 's21_iq_reflection_data', track_max_reflection = False):
         dl_logger.info('Measuring reflection with VNA')
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
@@ -145,13 +148,16 @@ class DataLogger:
         self.cmd_interface.set('na_commands', 'clear_averages')
         time.sleep(sec_wait_for_na_reflection_averaging)
         self.cmd_interface.cmd(reflection_endpoint, 'scheduled_log')
-        if fitting:
+        if fitting or track_max_reflection:
             s11_iq = self.cmd_interface.get(reflection_endpoint).payload.to_python()['value_cal']
             s11_re, s11_im = np.array(s11_iq[::2]), np.array(s11_iq[1::2])
             s11_pow = s11_re**2 + s11_im**2
             s11_mag = np.sqrt(s11_pow)
             s11_phase = np.unwrap(np.angle(s11_re+1j*s11_im))
             freq = np.linspace(start_freq, stop_freq, num = len(s11_pow))
+        if track_max_reflection:
+            self.cmd_interface.set('reflection_max', np.max(s11_pow))
+        if fitting:
             try:
                 popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
             except:

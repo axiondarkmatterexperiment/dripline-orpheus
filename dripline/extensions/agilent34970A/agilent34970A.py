@@ -6,6 +6,7 @@ import time
 from .muxer_calibrations import x83781_cal
 from .muxer_calibrations import x76690_cal
 from .muxer_calibrations import ruox202a_cal
+from .muxer_calibrations import pt100_cal
 
 __all__ = []
 
@@ -17,6 +18,7 @@ class MuxerService(EthernetSCPIService):
     def configure_scan(self, *args, **kwargs):
         '''
         loops over the service's internal list of endpoints and attempts to configure each, then configures and begins scan
+        Doesn't seem to work now.
         '''
         self.send_to_device('ABOR;*CLS;*OPC?')
 
@@ -84,7 +86,7 @@ class MuxerGetEntity(Entity):
         self.conf_str = conf_str.format(ch_number)
         Entity.__init__(self, **kwargs)
 
-    @calibrate([x83781_cal, x76690_cal, ruox202a_cal])
+    @calibrate([x83781_cal, x76690_cal, ruox202a_cal, pt100_cal])
     def on_get(self):
         result = self.service.send_to_device([self.get_str.format(self.ch_number)])
         if not result:
