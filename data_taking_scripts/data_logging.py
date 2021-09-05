@@ -315,7 +315,14 @@ class DataLogger:
         
         self.cmd_interface.set('lo_freq', lo_frequency)
         time.sleep(0.2)
-        self.cmd_interface.cmd('fast_daq', 'start-run')
+        try: 
+            self.cmd_interface.cmd('fast_daq', 'start-run')
+        except:
+            dl_logger.info('Fast daq pod isnt running yet. Try again')
+            #TODO treat the case where pod will never restart. Logarithmic backoff??
+            time.sleep(5)
+            self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
+
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
 
         # check if digitizer is done digitizing.
@@ -324,7 +331,7 @@ class DataLogger:
                 # constantly check if the digitizer is running. Helpful for checking if the fast_daq endpoint is reachable. If not, then digitization crashed.
                 daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             except:
-                #fast_daq endpoint is unreachable. That means digitization pod crashed for some reason and we just try again. This isn't a great solution. This is a recursive solution and I'm nervous about it.
+                dl_logger.info('Fast daq pod seemed to have crashed during digitization. Try again')
                 self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
             time.sleep(1)
         self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
