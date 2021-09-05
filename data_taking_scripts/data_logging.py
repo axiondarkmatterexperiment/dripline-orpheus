@@ -111,9 +111,9 @@ class DataLogger:
             self.cmd_interface.set('transmission_max', np.max(s21_pow))
         if fitting:
             try:
+                dl_logger.warning('Could not perform a proper fit')
                 popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             except:
-                self.stop_axion_data_taking()
                 sys.exit()
             perr_transmission = np.sqrt(np.diag(pcov_transmission))
             dl_logger.info('Transmission lorentzian fitted parameters')
@@ -161,7 +161,6 @@ class DataLogger:
             try:
                 popt_reflection, pcov_reflection = data_lorentzian_fit(s11_pow, freq, 'reflection')
             except:
-                self.stop_axion_data_taking()
                 dl_logger.warning('Could not perform a proper fit')
                 sys.exit()
             perr_reflection = np.sqrt(np.diag(pcov_reflection))
@@ -317,15 +316,18 @@ class DataLogger:
         self.cmd_interface.set('lo_freq', lo_frequency)
         time.sleep(0.2)
         self.cmd_interface.cmd('fast_daq', 'start-run')
-        time.sleep(digitization_time)
         daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
 
-        self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
-            dl_logger.warning('Digitization is taking longer than expected')
-            daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
-            time.sleep(2)
+            try:
+                # constantly check if the digitizer is running. Helpful for checking if the fast_daq endpoint is reachable. If not, then digitization crashed.
+                daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+            except:
+                #fast_daq endpoint is unreachable. That means digitization pod crashed for some reason and we just try again. This isn't a great solution. This is a recursive solution and I'm nervous about it.
+                self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
+            time.sleep(1)
+        self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
         if disable_motors: 
             self.enable_all_motors()
         dl_logger.info('Done digitizing')
