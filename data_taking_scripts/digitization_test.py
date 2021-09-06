@@ -13,7 +13,7 @@ sampling_rate = 125e9
 fft_size = 50e3
 fft_bin_width = sampling_rate/fft_size
 
-rf_center_frequency =  17.90485e9
+rf_center_frequency =  16.147e9
 if_center = 29.5e6
 digitization_time = 30
 
