@@ -93,15 +93,12 @@ try:
             the_interface.set('target_fo', resonant_freq_guess)
             target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
 
-        narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
-        narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
+        narrow_scan_start_freq_focus = target_fo - narrow_scan_span_focus/2
+        narrow_scan_stop_freq_focus = target_fo + narrow_scan_span_focus/2
 
         the_interface.set('axion_record_spectrum_status', 'start_measurement')
 
-        if increment_distance: 
-            the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
-        else: 
-            the_interface.cmd('axion_data_taking_short_snapshot_no_motors', 'log_entities')
+        the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
 
         data_logger.log_transmission_switches(narrow_scan_start_freq_focus, narrow_scan_stop_freq_focus, sec_wait_for_na_transmission_averaging, fitting = True, transmission_endpoint = 's21_iq_transmission_data')
 
@@ -153,8 +150,7 @@ try:
 
 except KeyboardInterrupt:
     dl_logger.info('stopping motors and modemap measurement')
-    if increment_distance:
-        orpheus_motors.stop_and_kill()
+    orpheus_motors.stop_and_kill()
     data_logger.start_axion_data_taking()
 
 data_logger.turn_off_all_switches()
