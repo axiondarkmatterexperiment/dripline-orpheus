@@ -77,20 +77,21 @@ try:
             break
         #take transmission measurement
         if not (i%widescan_interval):
+            the_interface.set('na_sweep_points', widescan_sweep_points)
             the_interface.set('na_measurement_status', 'start_measurement')
             the_interface.set('na_measurement_status_explanation', 'axion data taking. widescan')
-            the_interface.set('na_sweep_points', widescan_sweep_points)
             data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
             the_interface.set('na_sweep_points', sweep_points)
 
         #get frequency span for narrowscan
-        narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
-        narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
-        resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement/2)
-        narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
-        narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
-        the_interface.set('target_fo', resonant_freq_guess)
-        target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
+        if increment_distance:
+            narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
+            narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
+            resonant_freq_guess = data_logger.guess_resonant_frequency(narrow_scan_start_freq, narrow_scan_stop_freq, averaging_time = averaging_time_for_fo_guess_measurement/2)
+            narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
+            narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
+            the_interface.set('target_fo', resonant_freq_guess)
+            target_fo = the_interface.get('target_fo').payload.to_python()['value_cal']
 
         narrow_scan_start_freq_focus = target_fo-narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo+narrow_scan_span_focus/2
@@ -108,10 +109,7 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-        if increment_distance: 
-            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
-        else: 
-            data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True)
+        data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
 
         #record power going to digitizer, -20 dBm
         the_interface.cmd('power_monitor_voltage', 'scheduled_log')
