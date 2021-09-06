@@ -323,7 +323,12 @@ class DataLogger:
             time.sleep(5)
             self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
 
-        daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+        try:
+            # constantly check if the digitizer is running. Helpful for checking if the fast_daq endpoint is reachable. If not, then digitization crashed.
+            daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
+        except:
+            dl_logger.info('Fast daq pod seemed to have crashed during digitization. Try again')
+            self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
 
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
