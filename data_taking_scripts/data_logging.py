@@ -59,7 +59,7 @@ class DataLogger:
         return resonant_f
         
     def log_motor_steps(self):
-        for entitiy in self.list_of_motor_entities:
+        for entity in self.list_of_motor_entities:
             self.cmd_interface.cmd(entitiy, 'scheduled_log')
 
     def log_s21s11(self,start_freq, stop_freq, sec_wait_for_na_averaging):
