@@ -35,7 +35,7 @@ stop_freq = the_interface.get('na_stop_freq').payload.to_python()['value_cal']
 data_logger.log_transmission_switches(start_freq,stop_freq, 1, fitting = True, transmission_endpoint = 's21_iq_transmission_data')
 measured_f = the_interface.get('f_transmission').payload.to_python()['value_cal']
 measured_Q = the_interface.get('f_transmission').payload.to_python()['value_cal']
-rf_center_frequency = measured_f-5*measured_f/measured_Q
+rf_center_frequency = measured_f
 
 while the_interface.get('yfactor_measurement_status').payload.to_python()['value_cal'] == 'start_measurement':
     # keep track of the mode and always digitize 5 widths away
@@ -45,5 +45,5 @@ while the_interface.get('yfactor_measurement_status').payload.to_python()['value
     measured_f = the_interface.get('f_transmission').payload.to_python()['value_cal']
     measured_Q = the_interface.get('f_transmission').payload.to_python()['value_cal']
 
-    rf_center_frequency = measured_f-5*measured_f/measured_Q
+    rf_center_frequency = measured_f
     
