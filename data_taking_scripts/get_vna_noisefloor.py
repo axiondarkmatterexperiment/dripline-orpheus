@@ -1,3 +1,7 @@
+'''
+Obtain noise level of the VNA.
+'''
+
 from data_logging import DataLogger
 from dripline.core import Interface
 import numpy as np

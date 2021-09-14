@@ -84,7 +84,7 @@ try:
 
         if digitize:
             measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-            data_logger.digitize(measured_fo, if_center, digitization_time)
+            data_logger.digitize(measured_fo, if_center)
 
         dl_logger.info("now scanning distance = " +str(delta_length))
         current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
