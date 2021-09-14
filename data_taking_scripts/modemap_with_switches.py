@@ -91,7 +91,7 @@ try:
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
                                                                                              current_plate_separation,
-                                                                                             move_one_motor_at_a_time = True)
+                                                                                             move_one_motor_at_a_time = False)
         orpheus_motors.wait_for_motors()
         current_resonator_length_cm = current_resonator_length_cm+inch_to_cm(increment_distance)
 
