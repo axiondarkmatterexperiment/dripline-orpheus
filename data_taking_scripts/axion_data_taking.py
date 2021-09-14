@@ -106,7 +106,7 @@ try:
 
         #take axion data
         measured_fo = the_interface.get('f_transmission').payload.to_python()['value_cal']
-        data_logger.digitize(measured_fo, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
+        data_logger.digitize(measured_fo, if_center, fft_bin_width, log_power_monitor = True, disable_motors = disable_motors_while_digitizing)
 
         #record power going to digitizer, -20 dBm
         the_interface.cmd('power_monitor_voltage', 'scheduled_log')

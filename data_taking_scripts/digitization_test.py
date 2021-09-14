@@ -15,6 +15,5 @@ fft_bin_width = sampling_rate/fft_size
 
 rf_center_frequency =  16.147e9
 if_center = 29.5e6
-digitization_time = 30
 
-data_logger.digitize(rf_center_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True)
+data_logger.digitize(rf_center_frequency, if_center, fft_bin_width, log_power_monitor = True, disable_motors = True)
