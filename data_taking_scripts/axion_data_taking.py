@@ -75,6 +75,8 @@ try:
         start_cadence_time = time.time()
         if the_interface.get('axion_data_taking_status').payload.to_python()['value_cal'] == 'stop_measurement':
             break
+        #record that we are starting a measurement
+        the_interface.set('axion_record_spectrum_status', 'start_measurement')
         #take transmission measurement
         if not (i%widescan_interval):
             the_interface.set('na_sweep_points', widescan_sweep_points)
@@ -95,8 +97,6 @@ try:
 
         narrow_scan_start_freq_focus = target_fo - narrow_scan_span_focus/2
         narrow_scan_stop_freq_focus = target_fo + narrow_scan_span_focus/2
-
-        the_interface.set('axion_record_spectrum_status', 'start_measurement')
 
         the_interface.cmd('axion_data_taking_short_snapshot', 'log_entities')
 
