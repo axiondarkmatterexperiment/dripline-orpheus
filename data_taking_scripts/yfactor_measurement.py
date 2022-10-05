@@ -21,14 +21,9 @@ sampling_rate = 125e9
 fft_size = 50e3
 fft_bin_width = sampling_rate/fft_size
 
-f_0018 = 16.17e9
-Q_0018 = 7200
-delta_f = f_0018/Q_0018
 
 #rf_center_frequency =  16.e9 #choose something off resonance with the TEM_00-18 mode, maybe by 2 bandwidths
-rf_center_frequency = f_0018-2*delta_f
 if_center = 29.5e6
-digitization_time = 30
 
 yfactor_description = input('Describe the current y_factor measurement: ')
 data_logger.start_yfactor_measurement(yfactor_description)
@@ -36,8 +31,17 @@ data_logger.start_yfactor_measurement(yfactor_description)
 start_freq = the_interface.get('na_start_freq').payload.to_python()['value_cal']
 stop_freq = the_interface.get('na_stop_freq').payload.to_python()['value_cal']
 
+data_logger.log_transmission_switches(start_freq,stop_freq, 1, fitting = True, transmission_endpoint = 's21_iq_transmission_data', track_max_transmission=True)
+measured_f = the_interface.get('f_transmission').payload.to_python()
+measured_Q = the_interface.get('f_transmission').payload.to_python()
+rf_center_frequency = measured_f-5*measured_f/measured_Q
+
 while the_interface.get('yfactor_measurement_status').payload.to_python()['value_cal'] == 'start_measurement':
-    data_logger.digitize(rf_center_frequency, if_center, digitization_time, fft_bin_width, log_power_monitor = True, disable_motors = True, keep_vna_off = False)
+    # keep track of the mode and always digitize 5 widths away
+    data_logger.digitize(rf_center_frequency, if_center, fft_bin_width, log_power_monitor = True, disable_motors = True, keep_vna_off = False)
     data_logger.log_transmission_switches(start_freq,stop_freq, 1, fitting = True, transmission_endpoint = 's21_iq_transmission_data', track_max_transmission=True)
     data_logger.log_reflection_switches(start_freq,stop_freq, 1, fitting = True, reflection_endpoint = 's21_iq_reflection_data', track_max_reflection=True)
+    measured_f = the_interface.get('f_transmission').payload.to_python()
+    measured_Q = the_interface.get('f_transmission').payload.to_python()
+    rf_center_frequency = measured_f-5*measured_f/measured_Q
     

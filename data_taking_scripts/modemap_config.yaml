@@ -1,3 +1,5 @@
+#different configurations for taking a modemap.
+
 general_configs:
   num_plates: 4
   motors_to_move: ['curved_mirror', 'bottom_dielectric_plate', 'top_dielectric_plate']
@@ -5,7 +7,6 @@ general_configs:
   wide_scan_start_freq: 15000000000
   wide_scan_stop_freq: 18000000000
   if_center: 30000000
-  digitization_time: 30
   vna_power : -5
 
 measurement_configs:

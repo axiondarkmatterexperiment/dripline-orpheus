@@ -1,3 +1,7 @@
+'''
+Collection of utility functions used while data taking.
+'''
+
 from dripline.core import Interface
 import time
 import math
@@ -62,18 +66,11 @@ class DataLogger:
         for entity in self.list_of_motor_entities:
             self.cmd_interface.cmd(entitiy, 'scheduled_log')
 
-    def log_s21s11(self,start_freq, stop_freq, sec_wait_for_na_averaging):
-        self.set_start_freq(start_freq)
-        self.set_stop_freq(stop_freq)
-        self.cmd_interface.set('na_measurement_status', 'start_measurement')
-        for entity in self.list_of_na_entities:
-            self.cmd_interface(entity,'scheduled_log')
-	#  wait for network analyzer to finish several sweeps for averaging
-        time.sleep(sec_wait_for_na_averaging)
-        self.cmd_interface.cmd('na_s21_iq_data', 'scheduled_log')
-        self.cmd_interface.cmd('na_s11_iq_data_trace2', 'scheduled_log')
-
     def log_vna_data(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False):
+        '''
+        Used when there is no amplifier attached to the strongly coupled port. Straightforward s21, s11 measurement to obtain reflection and transmission measurements.
+        Assumes s11 is on the second trace..
+        '''
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
@@ -298,11 +295,20 @@ class DataLogger:
         self.cmd_interface.set('top_dielectric_plate_status_command', 'motor_enable')
 
     def _round_to_nearest_multiple(self, a_number, base):
+        '''Used to set the LO to the nearest IF bin.'''
         return base*round(a_number/base)
 
 
-    def digitize(self, resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable = 0, keep_vna_off = False, log_power_monitor = False, disable_motors = False):
-        ''' vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator '''
+    def digitize(self, resonant_frequency, if_center, fft_bin_width, vna_output_enable = 0, keep_vna_off = False, log_power_monitor = False, disable_motors = False):
+        ''' 
+        resonant_frequency: Frequency you want the digitizer bandwidth to be centered on.
+        if_center: Center of the digitizer window.
+        fft_bin_width: width of the digitizer bins. Used to make sure local oscillator is set so that different spectrums are aligned.
+        vna_output_enable will be set to 0 unless I'm using the VNA to inject a tone into my resonator
+        keep_vna_off: Turns VNA back on if false.
+        log_power_monitor: log the power monitor while digitizing if set to True.
+        disable_motors: If true, disable the motors while digitizing. This may prevent RFI from leaking in.
+        '''
         dl_logger.info('Now digitizing')
         self.cmd_interface.set('na_output_enable', vna_output_enable) #almost always should be 0. Otherwise you would see RFI.
         self.switch_digitization_path()
@@ -321,14 +327,14 @@ class DataLogger:
             dl_logger.info('Fast daq pod isnt running yet. Try again')
             #TODO treat the case where pod will never restart. Logarithmic backoff??
             time.sleep(5)
-            self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
+            self.digitize(resonant_frequency, if_center, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
 
         try:
             # constantly check if the digitizer is running. Helpful for checking if the fast_daq endpoint is reachable. If not, then digitization crashed.
             daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
         except:
             dl_logger.info('Fast daq pod seemed to have crashed during digitization. Try again')
-            self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
+            self.digitize(resonant_frequency, if_center, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
 
         # check if digitizer is done digitizing.
         while daq_status['server']['status'] == 'Running':
@@ -337,7 +343,7 @@ class DataLogger:
                 daq_status = self.cmd_interface.get('fast_daq', specifier='daq-status').payload.to_python()
             except:
                 dl_logger.info('Fast daq pod seemed to have crashed during digitization. Try again')
-                self.digitize(resonant_frequency, if_center, digitization_time, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
+                self.digitize(resonant_frequency, if_center, fft_bin_width, vna_output_enable, keep_vna_off, log_power_monitor, disable_motors)
             time.sleep(1)
         self.cmd_interface.cmd('power_monitor_voltage', 'scheduled_log')
         if disable_motors: 
@@ -345,7 +351,7 @@ class DataLogger:
         dl_logger.info('Done digitizing')
         if not keep_vna_off:
             dl_logger.info('Enabling VNA output')
-            self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1. May keep vna off for Y-factor measurements.
+            self.cmd_interface.set('na_output_enable', 1) #turns the VNA output back to 1. 
         time.sleep(0.2)
 
 
@@ -387,7 +393,7 @@ class DataLogger:
         self.cmd_interface.cmd('na_s11_iq_data', 'scheduled_log')
 
     def flmn(self,l, m, n, length,eps_r = 1, r0 = 33):
-        ''' Calculates the resonant frequency for TEM 00n mode.
+        ''' Calculates the resonant frequency for TEM 00n mode in an empty Fabry-Perot cavity..
             Input units should be in cm. '''
         c = 299792458.0
         pi = math.pi
@@ -403,6 +409,11 @@ class DataLogger:
         return resonant_frequency
 
     def switch_reflection_path(self):
+        '''
+        Keithley power supply that drives Teledyne switches.
+        Channel 2 is off, meaning we are on the VNA path.
+        Channel 1 is on, meaning we are on the reflection path.
+        '''
         dl_logger.info('Switching to reflection path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
@@ -413,6 +424,11 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_channel_output', 1)
 
     def switch_transmission_path(self):
+        '''
+        Keithley power supply that drives Teledyne switches.
+        Channel 2 is off, meaning we are on the VNA path.
+        Channel 1 is off, meaning we are on the transmission path.
+        '''
         dl_logger.info('Switching to transmission path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH2')
         time.sleep(0.001)
@@ -424,6 +440,11 @@ class DataLogger:
         time.sleep(0.001)
 
     def switch_digitization_path(self):
+        '''
+        Keithley power supply that drives Teledyne switches.
+        Channel 2 is on, meaning we are on the VNA path.
+        Channel 1 is off to keep the switch cool.
+        '''
         dl_logger.info('Switching to digitization path')
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         time.sleep(0.001)
@@ -434,6 +455,11 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_channel_output', 1)
 
     def turn_off_all_switches(self):
+        '''
+        Keithley power supply that drives Teledyne switches.
+        Channel 2 is off, meaning we are on the VNA path.
+        Channel 1 is off, meaning that we are on the transmission path.
+        '''
         dl_logger.info('Turning off all switches.')
         self.cmd_interface.set('switch_ps_select_channel', 'CH1')
         time.sleep(0.001)
@@ -444,6 +470,9 @@ class DataLogger:
         self.cmd_interface.set('switch_ps_channel_output', 0)
 
     def initialize_lo(self, lo_power):
+        '''
+        Makes sure that the Local Oscillator is on and at the appropriate power.
+        '''
         dl_logger.info('Turning on local oscillator.')
         self.cmd_interface.set('lo_power', lo_power)
         self.cmd_interface.set('lo_output_status', 'on')
