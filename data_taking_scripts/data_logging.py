@@ -112,10 +112,14 @@ class DataLogger:
                 popt_transmission, pcov_transmission = data_lorentzian_fit(s21_pow, freq, 'transmission')
             except:
                 sys.exit()
-            perr_transmission = np.sqrt(np.diag(pcov_transmission))
+            perr_transmission = np.sqrt(np.diag(pcov_transmission)) #pcov_transmission are covariances, so the diagonal is just the variances, so sqrt it to get the std dev.
             dl_logger.info('Transmission lorentzian fitted parameters')
             dl_logger.info('f, Q, dy, C')
             dl_logger.info(popt_transmission)
+            #the following three lines were added by me, JS... Looking at the documentation of curve fitting I believe that this should work
+            dl_logger.info('Transmission lorentzian fitted parameter error')
+            dl_logger.info('f_sigma, Q_sigma, dy_sigma, C_sigma')
+            dl_logger.info(perr_transmission)
 
             if transmission_endpoint == 's21_iq_transmission_data_stability_check':
                 self.cmd_interface.set('f_transmission_stability_check', popt_transmission[0])
@@ -168,6 +172,10 @@ class DataLogger:
             self.cmd_interface.set('Q_reflection', popt_reflection[1])
             self.cmd_interface.set('dy_reflection', popt_reflection[2])
             self.cmd_interface.set('C_reflection', popt_reflection[3])
+            #the following three lines were added by me, JS... Looking at the documentation of curve fitting I believe that this should work
+            dl_logger.info('Reflection lorentzian fitted parameter error')
+            dl_logger.info('f_sigma, Q_sigma, dy_sigma, C_sigma')
+            dl_logger.info(perr_reflection)
 
             cavity_phase = deconvolve_phase(freq, s11_phase)
 
