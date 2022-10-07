@@ -3,6 +3,9 @@ from scipy import stats
 from scipy.optimize import curve_fit
 from scipy.constants import constants
 from scipy.interpolate import interp1d
+import uncertainties
+from uncertainties import umath
+from uncertainties import ufloat
 
 def unpack_iq_data(data):
     ''' Input - [re,im,re,im,...]
@@ -156,8 +159,12 @@ def calculate_coupling(dy_over_C, s11_phase):
     '''
     Takes the Lorentzian dip normalized to the s11 background to calculate the coupling coefficient.
     '''
-    if dy_over_C > 1: return 1
-    Gamma_cav_f0 = np.sqrt(1-dy_over_C)
+    if dy_over_C > 1: 
+        if isinstance(dy_over_C,uncertainties.core.AffineScalarFunc):
+            return ufloat(1,0)
+        else:
+            return 1
+    Gamma_cav_f0 = umath.sqrt(1-dy_over_C)
     if determine_if_undercoupled(s11_phase):
         beta = (1 - Gamma_cav_f0)/(1+Gamma_cav_f0)
     else:
