@@ -12,6 +12,9 @@ from fitting_functions import reflection_deconvolve_line
 from fitting_functions import deconvolve_phase
 from scipy.interpolate import interp1d
 from fitting_functions import func_pow_reflected
+import uncertainties
+from uncertainties import ufloat
+from uncertainties import umath
 import logging
 logging.basicConfig(level=logging.INFO)
 dl_logger = logging.getLogger(__name__)
@@ -117,7 +120,7 @@ class DataLogger:
             dl_logger.info('f, Q, dy, C')
             dl_logger.info(popt_transmission)
             #the following three lines were added by me, JS... Looking at the documentation of curve fitting I believe that this should work
-            dl_logger.info('Transmission lorentzian fitted parameter error')
+            dl_logger.info('Transmission lorentzian fitted parameter errors')
             dl_logger.info('f_sigma, Q_sigma, dy_sigma, C_sigma')
             dl_logger.info(perr_transmission)
 
@@ -173,17 +176,27 @@ class DataLogger:
             self.cmd_interface.set('dy_reflection', popt_reflection[2])
             self.cmd_interface.set('C_reflection', popt_reflection[3])
             #the following three lines were added by me, JS... Looking at the documentation of curve fitting I believe that this should work
-            dl_logger.info('Reflection lorentzian fitted parameter error')
+            dl_logger.info('Reflection lorentzian fitted parameter errors')
             dl_logger.info('f_sigma, Q_sigma, dy_sigma, C_sigma')
             dl_logger.info(perr_reflection)
 
             cavity_phase = deconvolve_phase(freq, s11_phase)
+            
+            dy_over_C = popt_reflection[2]/popt_reflection[3]
+            #dy_over_C_err = perr_reflection[2]*perr_reflection[3] 
+            dy=popt_reflection[2]
+            C=popt_reflection[3]
+            dy_err=perr_reflection[2]
+            C_err=perr_reflection[3]
+            dy_over_C_err = np.sqrt(dy_err**2/C**2 + dy**2*C_err**2/C**4) #I believe this is the proper error propagation.
+            dy_over_C=ufloat(dy/C, dy_over_C_err)
+            
+            antenna_coupling = calculate_coupling(dy_over_C, cavity_phase)
 
-            antenna_coupling = calculate_coupling(popt_reflection[2]/popt_reflection[3], cavity_phase)
 
-
-            dl_logger.info("Antenna coupling : {}".format(antenna_coupling))
-            self.cmd_interface.set('antenna_coupling', antenna_coupling)
+            dl_logger.info("Antenna coupling : {}".format(antenna_coupling)) #Do I need to alter this line since antenna_coupling is a ufloat now? -JS
+            self.cmd_interface.set('antenna_coupling', antenna_coupling.n)
+            self.cmd_interface.set('antenna_coupling_error', antenna_coupling.s)
 
             Qu_reflection = popt_reflection[1]*(1+antenna_coupling)
             dl_logger.info("Unloaded Q from reflection measurement is : {}".format(Qu_reflection))
