@@ -24,7 +24,7 @@ locals().update(general_mechanical_configs)
 print("  Configurations  ")
 for i in range(len(list_of_keys)):
     print(F"{i}  {list_of_keys[i]}")
-picked_config = int(input(F"Pick you configuration (0 - {len(list_of_keys)-1}): "))
+picked_config = int(input(F"Pick your configuration (0 - {len(list_of_keys)-1}): "))
 locals().update(configs['measurement_configs'][list_of_keys[picked_config]])
 
 #setting up connection to dripline
@@ -133,6 +133,7 @@ try:
         #move plates if increment_distance is anything other than 0.
         if increment_distance: 
             #TODO figure out what to do with negative increment_distance
+            #Wait, I think this is fine as is. Any non-zero value is equivalent to TRUE --JS
             current_resonator_length_in, new_plate_separation = orpheus_motors.move_by_increment(increment_distance,
                                                                                              current_resonator_length_in,
                                                                                              num_plates,
