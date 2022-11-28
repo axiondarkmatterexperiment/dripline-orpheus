@@ -86,6 +86,7 @@ try:
             the_interface.set('na_sweep_points', sweep_points)
 
         #get frequency span for narrowscan
+        #How does it do this before the first transmission scan? It refers to s21_iq_transmission_data in the guess_resonant_frequency function. Won't the first guess be totally wrong?
         if increment_distance:
             narrow_scan_start_freq = target_fo - narrow_scan_span_guess/2
             narrow_scan_stop_freq = target_fo + narrow_scan_span_guess/2
