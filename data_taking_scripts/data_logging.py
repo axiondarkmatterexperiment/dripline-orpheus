@@ -89,7 +89,7 @@ class DataLogger:
 
     def log_transmission_switches(self, start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, transmission_endpoint = None, track_max_transmission = False):
         dl_logger.info('Measuring transmission with VNA')
-        self.cmd_interface.set('na_output_enable', 1) 
+	self.cmd_interface.set('na_output_enable', 1) 
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
@@ -136,7 +136,7 @@ class DataLogger:
 
     def log_reflection_switches(self, start_freq, stop_freq, sec_wait_for_na_reflection_averaging, na_iq_data_notes = '', autoscale = False, fitting = False, reflection_endpoint = 's21_iq_reflection_data', track_max_reflection = False):
         dl_logger.info('Measuring reflection with VNA')
-        self.cmd_interface.set('na_output_enable', 1) 
+	self.cmd_interface.set('na_output_enable', 1) 
         self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
@@ -189,7 +189,7 @@ class DataLogger:
 
     def log_transmission_reflection_switches(self,start_freq, stop_freq, sec_wait_for_na_averaging, na_iq_data_notes= '', autoscale = False, fitting = False):
         dl_logger.info('VNA reflection measurement')
-        self.cmd_interface.set('na_output_enable', 1) 
+	self.cmd_interface.set('na_output_enable', 1) 
 	self.set_start_freq(start_freq)
         self.set_stop_freq(stop_freq)
         dl_logger.info('Setting na_measurement_status to start_measurement')
