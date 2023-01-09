@@ -122,7 +122,7 @@ try:
 
         the_interface.set('axion_record_spectrum_status', 'stop_measurement')
 
-        # log reflection measurements
+        # log reflection measurements -- What? This is a transmission scan and is saved as such. -JS
         if not (i%widescan_interval):
             #switch is already in the reflection position. we just need to change the frequency range. So we don't have to average as long to have the system settle down.
             data_logger.log_transmission_switches(wide_scan_start_freq, wide_scan_stop_freq, sec_wait_for_na_transmission_averaging, na_iq_data_notes = 'axion data taking. widescan', transmission_endpoint= 's21_iq_transmission_data_widescan' )
