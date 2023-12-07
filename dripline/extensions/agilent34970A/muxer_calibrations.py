@@ -24,6 +24,34 @@ def _temp_from_calibration_file(resistance, calibration_file):
     interpolated_temperature = float(interpolated_function(abs(resistance))) # interpolation returns an array. Dripline can't handle numpy array. So I cast it to a float.
     return interpolated_temperature
 
+#I just copied this from /source/admx_muxer_cals.py in the dragonfly-extended repo. I bought an uncalibrated cernox, not realizing that they expect you to calibrate it yourself.
+# But they did ship me a piece of paper with measured values at LHe, LN and room temps, and for the main experiment it seems like using this function with
+# only these three data points is enough to calibrate the sensor... Leads_box_temp is an example of a sensor that uses this with only three data points.
+def piecewise_cal(values_x, values_y, this_x, log_x=False, log_y=False):
+    if log_x:
+        logger.debug("doing log x cal")
+        values_x = [math.log(x) for x in values_x]
+        this_x = math.log(this_x)
+    if log_y:
+        logger.debug("doing log y cal")
+        values_y = [math.log(y) for y in values_y]
+    try:
+        high_index = [i>this_x for i in values_x].index(True)
+    except ValueError:
+        high_index = -1
+        logger.warning("raw value is above the calibration range, extrapolating")
+        #raise dripline.core.DriplineValueError("raw value is likely above calibration range")
+    if high_index == 0:
+        high_index = 1
+        logger.warning("raw value is below the calibration range, extrapolating")
+        #raise dripline.core.DriplineValueError("raw value is below calibration range")
+    m = (values_y[high_index] - values_y[high_index - 1]) / (values_x[high_index] - values_x[high_index - 1])
+    to_return = values_y[high_index - 1] + m * (this_x - values_x[high_index - 1])
+    if log_y:
+        to_return = math.exp(to_return)
+    return to_return
+
+
 def x83781_cal(resistance):
     '''calibration for cernox'''
     calibration_file = calibration_dir + '/x83781_calibration.txt'
@@ -52,5 +80,12 @@ def pt100_cal(resistance):
     interpolated_temperature = _temp_from_calibration_file(resistance, calibration_file)
     return interpolated_temperature
 __all__.append("pt100_cal")
+
+def x201099(resistance):
+    '''Calibration for a cernox CX-1050-SD-HT'''
+    values_x = [75., 248., 2984.]
+    values_y = [295., 77., 4.2]
+    return piecewise_cal(values_x, values_y, abs(resistance), log_x=True, log_y=True)
+_all_calibrations.append(x84138)
 
 
