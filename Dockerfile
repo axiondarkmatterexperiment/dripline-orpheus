@@ -1,4 +1,4 @@
-from driplineorg/dripline-python:v4.7.1
+FROM driplineorg/dripline-python:v4.7.1
 RUN apt-get -y update
 RUN apt-get -y install vim 
 RUN pip3 install numpy
