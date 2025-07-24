@@ -86,6 +86,6 @@ def x201099(resistance):
     values_x = [75., 248., 2984.]
     values_y = [295., 77., 4.2]
     return piecewise_cal(values_x, values_y, abs(resistance), log_x=True, log_y=True)
-_all_calibrations.append(x84138)
+__all__.append(x201099)
 
 
